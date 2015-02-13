@@ -9,9 +9,9 @@ case class Service(ID: ServiceId, Service: ServiceType, Tags: Set[String], Port:
 object Service {
 
   implicit lazy val fmt: OFormat[Service] = (
-    (__ \ "ID").format[ServiceId] and
+      (__ \ "ID"     ).format[ServiceId] and
       (__ \ "Service").format[ServiceType] and
-      (__ \ "Tags").formatNullable[Set[String]].inmap[Set[String]](_.getOrElse(Set.empty),Option(_)) and
-      (__ \ "Port").format[Int]
+      (__ \ "Tags"   ).formatNullable[Set[String]].inmap[Set[String]](_.getOrElse(Set.empty),Option(_)) and
+      (__ \ "Port"   ).format[Int]
     )(Service.apply _, unlift(Service.unapply _))
 }

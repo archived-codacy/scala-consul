@@ -1,7 +1,8 @@
 package consul.v1.agent.service
 
+import consul.v1.agent.service.LocalService.{apply => applied}
 import consul.v1.common.ConsulRequestBasics._
-import consul.v1.common.Types.ServiceId
+import consul.v1.common.Types.{ServiceId, _}
 import play.api.http.Status
 import play.api.libs.json.{Json, Writes}
 
@@ -12,7 +13,7 @@ trait ServiceRequests {
 
   def deregister(serviceID:ServiceId):Future[Boolean]
 
-  def LocalService = consul.v1.agent.service.LocalService.apply _
+  def LocalService = applied(_: ServiceId, _: ServiceType, _: Set[String], _: Option[Int], _: Option[Check])
 
   def ttlCheck(ttl: String): Check = Check(Option.empty, Option.empty, Option(ttl))
 
@@ -22,7 +23,6 @@ trait ServiceRequests {
 object ServiceRequests {
 
   private implicit lazy val CheckWrites: Writes[Check] = Json.writes[Check]
-  private implicit lazy val LocalServiceWrites: Writes[LocalService] = Json.writes[LocalService]
 
   def apply(basePath: String)(implicit executionContext: ExecutionContext): ServiceRequests = new ServiceRequests {
 
