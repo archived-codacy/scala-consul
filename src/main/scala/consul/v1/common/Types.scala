@@ -1,7 +1,8 @@
 package consul.v1.common
 
 import play.api.libs.json.JsError
-
+trait Check
+trait ServiceTpe
 trait Types {
 
   type NodeId = ConsulIdentifier[Node]
@@ -10,11 +11,11 @@ trait Types {
   type ServiceId = ConsulIdentifier[Service]
   def ServiceId(value:String): ServiceId = ConsulIdentifier[Service](value)
 
-  trait Check
+
   type CheckId = ConsulIdentifier[Check]
   def CheckId(value:String): CheckId = ConsulIdentifier[Check](value)
 
-  trait ServiceTpe
+
   type ServiceType = ConsulIdentifier[ServiceTpe]
   def ServiceType(value:String):ServiceType = ConsulIdentifier[ServiceTpe](value)
 
