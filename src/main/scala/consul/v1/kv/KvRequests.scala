@@ -24,7 +24,7 @@ object KvRequests {
       jsonRequestMaker(
         fullPathFor(key),
         httpFunc = recurseDcRequestHolder(recurse,dc).andThen( _.get() )
-      )(_.validate[List[KvValue]])
+      )(_.validate[Option[List[KvValue]]].map(_.getOrElse(List.empty)))
     )
 
     def put[T](key: String, value: T, flags: Option[Int], acquire: Option[Int], release: Option[String], dc:Option[String])(implicit wrt: Writeable[T], ct: ContentTypeOf[T]): Future[Boolean] = {

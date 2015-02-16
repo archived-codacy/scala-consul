@@ -30,6 +30,13 @@ object ConsulRequestBasics {
     }
   }
 
+  def responseStatusDcRequestMaker[A](path: String, dc:Option[String], httpFunc: WSRequestHolder => Future[WSResponse])(body: Int => A)(implicit executionContext: ExecutionContext): Future[A] = {
+    responseStatusRequestMaker(
+      path,
+      (req:WSRequestHolder) => httpFunc(dc.map{ case dc => req.withQueryString("dc"->dc) }.getOrElse(req))
+    )(body)
+  }
+
   def stringRequestMaker[A](path: String, httpFunc: WSRequestHolder => Future[WSResponse])(body: String => A)(implicit executionContext: ExecutionContext): Future[A] = {
     val req = WS.url(path)
     httpFunc(req).map { case res =>

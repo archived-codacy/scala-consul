@@ -7,7 +7,7 @@ case class Node(Node: NodeId, Address: String)
 
 object Node {
 
-  implicit lazy val fmt: Format[Node] = (
+  implicit lazy val fmt: OFormat[Node] = (
       (__ \ "Node"   ).format[NodeId] and
       (__ \ "Address").format[String]
     )(Node.apply _, unlift(Node.unapply _))
