@@ -13,7 +13,7 @@ trait ServiceRequests {
 
   def deregister(serviceID:ServiceId):Future[Boolean]
 
-  def LocalService = applied(_: ServiceId, _: ServiceType, _: Set[String], _: Option[Int], _: Option[Check])
+  def LocalService = applied(_: ServiceId, _: ServiceType, _: Set[ServiceTag], _: Option[Int], _: Option[Check])
 
   def ttlCheck(ttl: String): Check = Check(Option.empty, Option.empty, Option(ttl))
 

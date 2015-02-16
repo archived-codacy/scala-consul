@@ -13,7 +13,7 @@ trait CatalogRequests {
   def nodes(dc:Option[String]=Option.empty): Future[Seq[Node]]
   def node(nodeID:NodeId,dc:Option[String]=Option.empty):Future[NodeProvidedServices]
   def services(dc:Option[String]=Option.empty):Future[Map[ServiceType,Set[String]]]
-  def service(service:ServiceType,tag:Option[String]=Option.empty, dc:Option[String]=Option.empty):Future[Seq[NodeProvidingService]]
+  def service(service:ServiceType,tag:Option[ServiceTag]=Option.empty, dc:Option[String]=Option.empty):Future[Seq[NodeProvidingService]]
 }
 
 object CatalogRequests {
@@ -28,7 +28,7 @@ object CatalogRequests {
       jsonDcRequestMaker(fullPathFor(s"node/$nodeID"),dc, _.get())(_.validate[NodeProvidedServices])
     )
 
-    def service(service: ServiceType, tag:Option[String], dc:Option[String]) = erased(
+    def service(service: ServiceType, tag:Option[ServiceTag], dc:Option[String]) = erased(
       jsonDcRequestMaker(fullPathFor(s"service/$service"),dc,
         (r:WSRequestHolder) => tag.map{ case tag => r.withQueryString("tag"->tag) }.getOrElse(r).get()
       )(_.validate[Seq[NodeProvidingService]])
