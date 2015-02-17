@@ -1,7 +1,6 @@
 package consul.v1.agent.check
 
 import consul.v1.common.ConsulRequestBasics._
-import consul.v1.common.Types
 import consul.v1.common.Types.CheckId
 import play.api.http.Status
 import play.api.libs.json.Json
@@ -37,7 +36,7 @@ object CheckRequests{
       registerPath,_.put(Json.toJson(check))
     )(_ == Status.OK)
 
-    def deregister(checkId: Types.CheckId): Future[Boolean] = responseStatusRequestMaker(
+    def deregister(checkId: CheckId): Future[Boolean] = responseStatusRequestMaker(
       fullPathFor(s"deregister/$checkId"),_.get()
     )(_ == Status.OK)
 
