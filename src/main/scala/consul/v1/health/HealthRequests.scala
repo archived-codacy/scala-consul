@@ -30,11 +30,11 @@ object HealthRequests {
     }
 
     def node(nodeID: NodeId,dc:Option[String]) = erased(
-      jsonDcRequestMaker(fullPathFor(s"/node/$nodeID"),dc, _.get())(_.validate[Seq[Check]])
+      jsonDcRequestMaker(fullPathFor(s"node/$nodeID"),dc, _.get())(_.validate[Seq[Check]])
     )
 
     def checks(serviceID:ServiceType,dc:Option[String]) = erased(
-      jsonDcRequestMaker(fullPathFor(s"/checks/$serviceID"),dc, _.get())(_.validate[Seq[Check]])
+      jsonDcRequestMaker(fullPathFor(s"checks/$serviceID"),dc, _.get())(_.validate[Seq[Check]])
     )
 
     def state(state:CheckStatus,dc:Option[String]): Future[Seq[Check]] = erased(
