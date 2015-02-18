@@ -5,20 +5,20 @@ import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
-case class KvValue(CreateIndex: Int, ModifyIndex: Int, LockIndex: Int, Key: String, Flags: Int, Value: String, Session: String)
+case class KvValue(CreateIndex: Int, ModifyIndex: Int, LockIndex: Int, Key: String, Flags: Int, Value: String, Session: Option[String])
 object KvValue{
 
-  val valueReads = StringReads.map{ case encodedValue =>
+  val base64valueReads = StringReads.map{ case encodedValue =>
     new String(Base64.getDecoder.decode(encodedValue))
   }
 
   implicit val reads = (
-        (__ \ "CreateIndex").read[Int] and
-        (__ \ "ModifyIndex").read[Int] and
-        (__ \ "LockIndex"  ).read[Int] and
-        (__ \ "Key"        ).read[String] and
-        (__ \ "Flags"      ).read[Int] and
-        (__ \ "Value"      ).read(valueReads) and
-        (__ \ "Session"    ).read[String]
+      (__ \ "CreateIndex").read[Int] and
+      (__ \ "ModifyIndex").read[Int] and
+      (__ \ "LockIndex"  ).read[Int] and
+      (__ \ "Key"        ).read[String] and
+      (__ \ "Flags"      ).read[Int] and
+      (__ \ "Value"      ).read(base64valueReads) and
+      (__ \ "Session"    ).readNullable[String]
     )(KvValue.apply _)
 }
