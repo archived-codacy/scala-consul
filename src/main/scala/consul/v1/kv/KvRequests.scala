@@ -2,7 +2,6 @@ package consul.v1.kv
 
 import consul.v1.common.ConsulRequestBasics._
 import play.api.http.{ContentTypeOf, Writeable}
-import play.api.libs.json.Json
 import play.api.libs.ws.WSRequestHolder
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -15,8 +14,6 @@ trait KvRequests {
 }
 
 object KvRequests {
-
-  private implicit lazy val kvReads = Json.reads[KvValue]
 
   def apply(basePath: String)(implicit executionContext: ExecutionContext): KvRequests = new KvRequests{
 
