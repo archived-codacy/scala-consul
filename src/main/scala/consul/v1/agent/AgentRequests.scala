@@ -30,12 +30,12 @@ object AgentRequests {
     )
 
     def join(address: String,wan:Boolean): Future[Boolean] = responseStatusRequestMaker(
-      fullPathFor(address),
+      fullPathFor(s"join/$address"),
       (r:WSRequestHolder) => (if(wan) r.withQueryString(("wan","1")) else r).get()
     )( _ == Status.OK )
 
     def `force-leave`(node: Types.NodeId): Future[Boolean] = responseStatusRequestMaker(
-      fullPathFor(node),_.get()
+      fullPathFor(s"force-leave/$node"),_.get()
     )( _ == Status.OK )
 
     lazy val service: ServiceRequests = ServiceRequests(currPath)

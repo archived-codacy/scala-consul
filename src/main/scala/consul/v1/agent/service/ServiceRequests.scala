@@ -33,7 +33,6 @@ object ServiceRequests {
       responseStatusRequestMaker(fullPathFor(s"deregister/$serviceID"), _.get())(_ == Status.OK)
 
     private def fullPathFor(path: String) = s"$basePath/service/$path"
-
   }
 
 }
