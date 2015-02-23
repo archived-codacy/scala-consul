@@ -4,44 +4,28 @@ import play.api.libs.json._
 import play.api.libs.ws.{WS, WSRequestHolder, WSResponse}
 import play.api.Play.current
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 object ConsulRequestBasics {
 
   def jsonRequestMaker[A](path: String, httpFunc: WSRequestHolder => Future[WSResponse])(body: JsValue => A)(implicit executionContext: ExecutionContext): Future[A] = {
-    val req = WS.url(path)
-    httpFunc(req).map { case res =>
-      val json = Try(res.json).getOrElse(JsNull)
-      body(json)
-    }
+    genRequestMaker(path,httpFunc)(_.json)(body)
   }
 
   def jsonDcRequestMaker[A](path: String, dc:Option[String], httpFunc: WSRequestHolder => Future[WSResponse])(body: JsValue => A)(implicit executionContext: ExecutionContext): Future[A] = {
-    jsonRequestMaker(
-      path,
-      (req:WSRequestHolder) => httpFunc(dc.map{ case dc => req.withQueryString("dc"->dc) }.getOrElse(req))
-    )(body)
+    jsonRequestMaker(path, withDc(httpFunc,dc))(body)
   }
 
   def responseStatusRequestMaker[A](path: String, httpFunc: WSRequestHolder => Future[WSResponse])(body: Int => A)(implicit executionContext: ExecutionContext): Future[A] = {
-    val req = WS.url(path)
-    httpFunc(req).map { case res =>
-      body(res.status)
-    }
+    genRequestMaker(path,httpFunc)(_.status)(body)
   }
 
   def responseStatusDcRequestMaker[A](path: String, dc:Option[String], httpFunc: WSRequestHolder => Future[WSResponse])(body: Int => A)(implicit executionContext: ExecutionContext): Future[A] = {
-    responseStatusRequestMaker(
-      path,
-      (req:WSRequestHolder) => httpFunc(dc.map{ case dc => req.withQueryString("dc"->dc) }.getOrElse(req))
-    )(body)
+    responseStatusRequestMaker(path, withDc(httpFunc,dc))(body)
   }
 
   def stringRequestMaker[A](path: String, httpFunc: WSRequestHolder => Future[WSResponse])(body: String => A)(implicit executionContext: ExecutionContext): Future[A] = {
-    val req = WS.url(path)
-    httpFunc(req).map { case res =>
-      body(res.body)
-    }
+    genRequestMaker(path,httpFunc)(_.body)(body)
   }
 
   def erased[A](future:Future[JsResult[A]])(implicit executionContext: ExecutionContext) = {
@@ -51,4 +35,15 @@ object ConsulRequestBasics {
     })
   }
 
+  private def genRequestMaker[A,B](path: String, httpFunc: WSRequestHolder => Future[WSResponse])(responseTransformer: WSResponse => B)(body: B => A)(implicit executionContext: ExecutionContext): Future[A] = {
+
+    Try(httpFunc(WS.url(path))) match {
+      case Failure(exception) => Future.failed(exception)
+      case Success(resultF)   => resultF.map( responseTransformer andThen body )
+    }
+  }
+
+  private def withDc(httpFunc: WSRequestHolder => Future[WSResponse],dc:Option[String]) = {
+    (req:WSRequestHolder) => httpFunc(dc.map{ case dc => req.withQueryString("dc"->dc) }.getOrElse(req))
+  }
 }
