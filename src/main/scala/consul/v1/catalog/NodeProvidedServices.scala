@@ -13,7 +13,7 @@ object NodeProvidedServices{
 
   implicit val reads: Reads[NodeProvidedServices] = (
     ( __ \ "Node").read[Node] and
-      ( __ \ "Services").read[Map[String,Service]].map(_.map{ case (key,value) => ServiceType(key)->value })
-    )( NodeProvidedServices.apply _)
+    ( __ \ "Services").read[Map[String,Service]].map(_.map{ case (key,value) => ServiceType(key)->value })
+  )( NodeProvidedServices.apply _)
 
 }

@@ -2,9 +2,11 @@ package consul.v1.agent
 
 import consul.v1.agent.check.CheckRequests
 import consul.v1.agent.service.ServiceRequests
+
 import consul.v1.common.ConsulRequestBasics._
-import consul.v1.common.Types
+import consul.v1.common.{Service, Types}
 import consul.v1.common.Types._
+import consul.v1.health.Check
 import play.api.http.Status
 import play.api.libs.json.JsObject
 import play.api.libs.ws.WSRequestHolder
@@ -17,6 +19,10 @@ trait AgentRequests {
   def join(address:String,wan:Boolean=false):Future[Boolean]
   def `force-leave`(node:NodeId):Future[Boolean]
   def maintenance(enable:Boolean,reason:Option[String]):Future[Boolean]
+
+  def checks():Future[Map[CheckId,Check]]
+  def services():Future[Map[ServiceId,Service]]
+
 
   def service: ServiceRequests
   def check: CheckRequests
@@ -44,14 +50,26 @@ object AgentRequests {
       responseStatusRequestMaker( maintenancePath, _.withQueryString(params:_*).get() )(_ == Status.OK)
     }
 
-    lazy val service: ServiceRequests = ServiceRequests(currPath)
+    def checks(): Future[Map[CheckId, Check]] = erased(
+      jsonRequestMaker(checksPath, _.get() )(
+        _.validate[Map[String,Check]].map(_.map{ case (key,value) => CheckId(key)->value })
+      )
+    )
 
+    def services(): Future[Map[ServiceId,Service]] = erased(
+      jsonRequestMaker(servicesPath, _.get() )(
+        _.validate[Map[String,Service]].map(_.map{ case (key,value) => ServiceId(key)->value })
+      )
+    )
+
+    lazy val service: ServiceRequests = ServiceRequests(currPath)
     lazy val check:CheckRequests = CheckRequests(currPath)
 
     private lazy val maintenancePath = fullPathFor("maintenance")
+    private lazy val checksPath = fullPathFor("checks")
+    private lazy val servicesPath = fullPathFor("services")
 
     private lazy val currPath = s"$basePath/agent"
-
     private def fullPathFor(path: String) = s"$currPath/$path"
 
   }

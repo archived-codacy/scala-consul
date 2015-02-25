@@ -13,9 +13,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class Deregisterable(Node:NodeId,ServiceID:Option[ServiceId],CheckID:Option[CheckId],Datacenter:Option[String])
 
-case class Service(ID:ServiceId,Service:ServiceType,Tags:Set[ServiceTag],Address:Option[String],Port:Option[Int])
-case class Check(Node:NodeId,CheckID:CheckId,Name:String,Notes:Option[String],Status:CheckStatus,ServiceID:Option[ServiceId])
-case class Registerable(Node:NodeId,Address:String,Service:Option[Service],Check:Option[Check],Datacenter:Option[String])
+case class RService(ID:ServiceId,Service:ServiceType,Tags:Set[ServiceTag],Address:Option[String],Port:Option[Int])
+case class RCheck(Node:NodeId,CheckID:CheckId,Name:String,Notes:Option[String],Status:CheckStatus,ServiceID:Option[ServiceId])
+case class Registerable(Node:NodeId,Address:String,Service:Option[RService],Check:Option[RCheck],Datacenter:Option[String])
 
 trait CatalogRequests {
   def register(registerable:Registerable):Future[Boolean]
@@ -40,8 +40,8 @@ object CatalogRequests {
 
   private implicit lazy val deregisterWrites = Json.writes[Deregisterable]
   private implicit lazy val registerWrites   = {
-    implicit val serviceWrites = Json.writes[Service]
-    implicit val checkWrites = Json.writes[Check]
+    implicit val serviceWrites = Json.writes[RService]
+    implicit val checkWrites = Json.writes[RCheck]
 
     Json.writes[Registerable]
   }
