@@ -1,5 +1,5 @@
 # scala-consul
-A Consul (https://consul.io/) API for scala (http://scala-lang.org/)
+Scala (http://scala-lang.org/) client for Consul (https://consul.io/)
 
 
 instanciate a consul supplying an ip and an optional port indicating a working consul agent:
