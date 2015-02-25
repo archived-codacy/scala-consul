@@ -3,23 +3,39 @@ package consul.v1.agent.check
 import consul.v1.common.ConsulRequestBasics._
 import consul.v1.common.Types.CheckId
 import play.api.http.Status
-import play.api.libs.json.Json
+import play.api.libs.json.{Writes, Json}
 import play.api.libs.ws.WSRequestHolder
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Check(ID:CheckId,Name:String,Notes:Option[String],Script:Option[String],Interval:Option[String],TTL:Option[String])
-
+case class Check(ID:CheckId,Name:String,Notes:Option[String],Script:Option[String],HTTP:Option[String],Interval:Option[String],TTL:Option[String])
 
 object Check{
-  implicit lazy val writes = ???
+  implicit lazy val writes: Writes[Check] = Json.writes[Check]
+}
 
-  def apply(Name:String,Notes:Option[String],Script:Option[String],Interval:Option[String],TTL:Option[String]):Check =
-    Check(CheckId(Name),Name,Notes,Script,Interval,TTL)
+trait CheckCreators{
+  def ttlCheck(ID:CheckId,Name:String,Notes:Option[String],TTL:String):Check =
+    Check(ID,Name,Notes,Option.empty,Option.empty,Option.empty,Option(TTL))
+
+  def ttlCheck(Name:String,Notes:Option[String],TTL:String):Check =
+    ttlCheck(CheckId(Name),Name,Notes,TTL)
+
+  def scriptCheck(ID:CheckId,Name:String,Notes:Option[String],Script:String,Interval:String):Check =
+    Check(ID,Name,Notes,Option(Script),Option.empty,Option(Interval),Option.empty)
+
+  def scriptCheck(Name:String,Notes:Option[String],Script:String,Interval:String):Check =
+    scriptCheck(CheckId(Name),Name,Notes,Script,Interval)
+
+  def httpCheck(ID:CheckId,Name:String,Notes:Option[String],HTTP:String,Interval:String):Check =
+    Check(ID,Name,Notes,Option.empty,Option(HTTP),Option(Interval),Option.empty)
+
+  def httpCheck(Name:String,Notes:Option[String],Script:String,Interval:String):Check =
+    httpCheck(CheckId(Name),Name,Notes,Script,Interval)
 
 }
 
-trait CheckRequests{
+trait CheckRequests extends CheckCreators{
   def register(check:Check):Future[Boolean]
   def deregister(checkId:CheckId):Future[Boolean]
   def pass(checkId:CheckId,note:Option[String]=Option.empty):Future[Boolean]
@@ -46,12 +62,11 @@ object CheckRequests{
 
     def fail(checkId: CheckId,note:Option[String]): Future[Boolean] = functionForStatus("fail")(checkId,note)
 
-    private def functionForStatus(status:String) = (checkId: CheckId,note:Option[String]) => {
-      val httpFunc =
+    private def functionForStatus(status:String) = (checkId: CheckId,note:Option[String]) =>
+      responseStatusRequestMaker(
+        fullPathFor(s"$status/$checkId"),
         (r:WSRequestHolder) => note.map{ case note => r.withQueryString("note"->note) }.getOrElse( r ).get()
-
-      responseStatusRequestMaker(fullPathFor(s"$status/$checkId"),httpFunc)(_ == Status.OK)
-    }
+      )(_ == Status.OK)
 
     private def fullPathFor(path: String) = s"$basePath/check/$path"
 

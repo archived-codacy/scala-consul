@@ -5,9 +5,9 @@ import consul.v1.agent.service.ServiceRequests
 import consul.v1.common.ConsulRequestBasics._
 import consul.v1.common.Types
 import consul.v1.common.Types._
+import play.api.http.Status
 import play.api.libs.json.JsObject
 import play.api.libs.ws.WSRequestHolder
-import play.mvc.Http.Status
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -16,6 +16,7 @@ trait AgentRequests {
   def self(): Future[JsObject]
   def join(address:String,wan:Boolean=false):Future[Boolean]
   def `force-leave`(node:NodeId):Future[Boolean]
+  def maintenance(enable:Boolean,reason:Option[String]):Future[Boolean]
 
   def service: ServiceRequests
   def check: CheckRequests
@@ -38,9 +39,16 @@ object AgentRequests {
       fullPathFor(s"force-leave/$node"),_.get()
     )( _ == Status.OK )
 
+    def maintenance(enable:Boolean,reason:Option[String]): Future[Boolean] = {
+      lazy val params = Seq(("enable",enable.toString)) ++ reason.map("reason"->_)
+      responseStatusRequestMaker( maintenancePath, _.withQueryString(params:_*).get() )(_ == Status.OK)
+    }
+
     lazy val service: ServiceRequests = ServiceRequests(currPath)
 
     lazy val check:CheckRequests = CheckRequests(currPath)
+
+    private lazy val maintenancePath = fullPathFor("maintenance")
 
     private lazy val currPath = s"$basePath/agent"
 

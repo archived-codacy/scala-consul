@@ -2,6 +2,7 @@ package consul.v1.agent.service
 
 import consul.v1.agent.service.LocalService.{apply => applied}
 import consul.v1.common.ConsulRequestBasics._
+import consul.v1.common.Types
 import consul.v1.common.Types.{ServiceId, _}
 import play.api.http.Status
 import play.api.libs.json.{Json, Writes}
@@ -13,18 +14,30 @@ trait ServiceRequests {
 
   def deregister(serviceID:ServiceId):Future[Boolean]
 
+  def maintenance(serviceID:ServiceId,enable:Boolean,reason:Option[String]):Future[Boolean]
+
   def LocalService = applied(_: ServiceId, _: ServiceType, _: Set[ServiceTag], _: Option[Int], _: Option[Check])
 
-  def ttlCheck(ttl: String): Check = Check(Option.empty, Option.empty, Option(ttl))
+  def ttlCheck(ttl: String): Check = Check(Option.empty, Option.empty,Option.empty, Option(ttl))
 
-  def scriptCheck(script: String, interval: String): Check = Check(Option(script), Option(interval), Option.empty)
+  def scriptCheck(script: String, interval: String): Check = Check(Option(script), Option.empty,Option(interval), Option.empty)
+
+  def httpCheck(http:String,interval:String):Check = Check(Option.empty, Option(http), Option(interval), Option.empty)
 }
 
 object ServiceRequests {
 
   private implicit lazy val CheckWrites: Writes[Check] = Json.writes[Check]
 
-  def apply(basePath: String)(implicit executionContext: ExecutionContext): ServiceRequests = new ServiceRequests {
+  def apply(basePath: String)(implicit executionContext: ExecutionContext): ServiceRequests = new ServiceRequests{
+
+    def maintenance(serviceID: Types.ServiceId,enable:Boolean,reason:Option[String]): Future[Boolean] = {
+      lazy val params = Seq(("enable",enable.toString)) ++ reason.map("reason"->_)
+      responseStatusRequestMaker(
+        fullPathFor(s"maintenance/$serviceID"),
+        _.withQueryString(params:_*).get()
+      )(_ == Status.OK)
+    }
 
     def register(localService: LocalService): Future[Boolean] =
       responseStatusRequestMaker(fullPathFor("register"), _.put(Json.toJson(localService)))(_ == Status.OK)
@@ -33,6 +46,7 @@ object ServiceRequests {
       responseStatusRequestMaker(fullPathFor(s"deregister/$serviceID"), _.get())(_ == Status.OK)
 
     private def fullPathFor(path: String) = s"$basePath/service/$path"
+
   }
 
 }
