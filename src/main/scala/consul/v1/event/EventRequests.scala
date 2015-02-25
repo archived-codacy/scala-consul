@@ -10,7 +10,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait EventRequests {
 
-  def fire[T](name:String, payload:T,node:Option[NodeId]=Option.empty,service:Option[ServiceId]=Option.empty, tag:Option[ServiceTag]=Option.empty,dc:Option[String]=Option.empty)(implicit wrt: Writeable[T], ct: ContentTypeOf[T]):Future[Event]
+  def fire[T](name:String, payload:T,node:Option[NodeId]=Option.empty,service:Option[ServiceId]=Option.empty, tag:Option[ServiceTag]=Option.empty,dc:Option[DatacenterId]=Option.empty)(implicit wrt: Writeable[T], ct: ContentTypeOf[T]):Future[Event]
   def list(name:Option[String]=Option.empty):Future[List[Event]]
 }
 
@@ -20,7 +20,7 @@ object EventRequests{
 
   def apply(basePath: String)(implicit executionContext: ExecutionContext):EventRequests = new EventRequests {
 
-    def fire[T](name:String, payload:T,node:Option[NodeId],service:Option[ServiceId],tag:Option[ServiceTag],dc:Option[String])(
+    def fire[T](name:String, payload:T,node:Option[NodeId],service:Option[ServiceId],tag:Option[ServiceTag],dc:Option[DatacenterId])(
                 implicit wrt: Writeable[T], ct: ContentTypeOf[T]):Future[Event] = {
 
       val params = node.map("node"->_.toString).toList ++ service.map("service"->_.toString) ++ tag.map("tag"->_.toString)

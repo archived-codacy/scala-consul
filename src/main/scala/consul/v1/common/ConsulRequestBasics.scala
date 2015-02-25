@@ -1,5 +1,6 @@
 package consul.v1.common
 
+import consul.v1.common.Types.DatacenterId
 import play.api.libs.json._
 import play.api.libs.ws.{WS, WSRequestHolder, WSResponse}
 import play.api.Play.current
@@ -12,7 +13,7 @@ object ConsulRequestBasics {
     genRequestMaker(path,httpFunc)(_.json)(body)
   }
 
-  def jsonDcRequestMaker[A](path: String, dc:Option[String], httpFunc: WSRequestHolder => Future[WSResponse])(body: JsValue => A)(implicit executionContext: ExecutionContext): Future[A] = {
+  def jsonDcRequestMaker[A](path: String, dc:Option[DatacenterId], httpFunc: WSRequestHolder => Future[WSResponse])(body: JsValue => A)(implicit executionContext: ExecutionContext): Future[A] = {
     jsonRequestMaker(path, withDc(httpFunc,dc))(body)
   }
 
@@ -20,7 +21,7 @@ object ConsulRequestBasics {
     genRequestMaker(path,httpFunc)(_.status)(body)
   }
 
-  def responseStatusDcRequestMaker[A](path: String, dc:Option[String], httpFunc: WSRequestHolder => Future[WSResponse])(body: Int => A)(implicit executionContext: ExecutionContext): Future[A] = {
+  def responseStatusDcRequestMaker[A](path: String, dc:Option[DatacenterId], httpFunc: WSRequestHolder => Future[WSResponse])(body: Int => A)(implicit executionContext: ExecutionContext): Future[A] = {
     responseStatusRequestMaker(path, withDc(httpFunc,dc))(body)
   }
 
@@ -43,7 +44,7 @@ object ConsulRequestBasics {
     }
   }
 
-  private def withDc(httpFunc: WSRequestHolder => Future[WSResponse],dc:Option[String]) = {
-    (req:WSRequestHolder) => httpFunc(dc.map{ case dc => req.withQueryString("dc"->dc) }.getOrElse(req))
+  private def withDc(httpFunc: WSRequestHolder => Future[WSResponse],dc:Option[DatacenterId]) = {
+    (req:WSRequestHolder) => httpFunc(dc.map{ case dc => req.withQueryString("dc"->dc.toString) }.getOrElse(req))
   }
 }

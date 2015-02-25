@@ -11,8 +11,8 @@ object Service {
   implicit lazy val fmt: OFormat[Service] = (
       (__ \ "ID"     ).format[ServiceId] and
       (__ \ "Service").format[ServiceType] and
-      (__ \ "Tags"   ).formatNullable[Set[String]].inmap[Set[String]](_.getOrElse(Set.empty),Option(_)) and
-      (__ \ "Address"   ).format[String] and
+      (__ \ "Tags"   ).formatNullable[Set[String]].inmap[Set[String]](_.getOrElse(Set.empty),Option.apply) and
+      (__ \ "Address").format[String] and
       (__ \ "Port"   ).format[Int]
     )(Service.apply _, unlift(Service.unapply _))
 }
