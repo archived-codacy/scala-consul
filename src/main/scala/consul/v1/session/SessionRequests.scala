@@ -64,7 +64,6 @@ object SessionRequests{
     private lazy val listPath = fullPathFor("list")
     private def fullPathFor(path: String) = s"$basePath/session/$path"
 
-
   }
 
 }
