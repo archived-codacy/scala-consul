@@ -1,5 +1,6 @@
 package consul.v1.catalog
 
+import consul.v1.common.CheckStatus._
 import consul.v1.common.ConsulRequestBasics._
 import consul.v1.common.Types._
 import consul.v1.common.{Node, Types}
@@ -12,8 +13,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class Deregisterable(Node:NodeId,ServiceID:Option[ServiceId],CheckID:Option[CheckId],Datacenter:Option[String])
 
+case class Service(ID:ServiceId,Service:ServiceType,Tags:Set[ServiceTag],Address:Option[String],Port:Option[Int])
+case class Check(Node:NodeId,CheckID:CheckId,Name:String,Notes:Option[String],Status:CheckStatus,ServiceID:Option[ServiceId])
+case class Registerable(Node:NodeId,Address:String,Service:Option[Service],Check:Option[Check],Datacenter:Option[String])
+
 trait CatalogRequests {
-  //def register(node:Node, service:Option[Service], check:Option[Check], dc:Option[String]=Option.empty):Future[Boolean]
+  def register(registerable:Registerable):Future[Boolean]
   def deregister(deregisterable:Deregisterable):Future[Boolean]
   def datacenters(): Future[Seq[String]]
   def nodes(dc:Option[String]=Option.empty): Future[Seq[Node]]
@@ -34,16 +39,23 @@ trait CatalogRequests {
 object CatalogRequests {
 
   private implicit lazy val deregisterWrites = Json.writes[Deregisterable]
+  private implicit lazy val registerWrites   = {
+    implicit val serviceWrites = Json.writes[Service]
+    implicit val checkWrites = Json.writes[Check]
+
+    Json.writes[Registerable]
+  }
 
   def apply(basePath: String)(implicit executionContext: ExecutionContext): CatalogRequests = new CatalogRequests {
 
-    /*def register(node: Node, service:Option[Service], check:Option[Check], dc:Option[String]): Future[Boolean] = responseStatusDcRequestMaker(
-      registerPath,dc,
-      _.put( regW.writes(service,node,check,dc) )
-    )(_ == Status.OK)*/
+    def register(registerable: Registerable): Future[Boolean] = responseStatusRequestMaker(
+      registerPath,
+      _.put( Json.toJson(registerable) )
+    )(_ == Status.OK)
 
     def deregister(deregisterable:Deregisterable):Future[Boolean] = responseStatusRequestMaker(
-      deregisterPath,_.put(Json.toJson(deregisterable))
+      deregisterPath,
+      _.put(Json.toJson(deregisterable))
     )(_ == Status.OK)
 
     def nodes(dc:Option[String]) = erased(
