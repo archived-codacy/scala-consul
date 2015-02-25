@@ -2,20 +2,11 @@ package consul.v1.session
 
 import consul.v1.common.ConsulRequestBasics._
 import consul.v1.common.Types.NodeId
-import consul.v1.common.JsonEnumeration
-import consul.v1.common.Types.CheckId
 import play.api.http.Status
 import play.api.libs.json.Json
 
 import scala.concurrent.{ExecutionContext, Future}
 
-object Behaviour extends Enumeration with JsonEnumeration{
-  val release,delete = Value
-}
-
-case class SessionDef(LockDelay:Option[String]=Option.empty,Name:Option[String]=Option.empty,Node:Option[String]=Option.empty,Checks:Option[Seq[CheckId]]=Option.empty,Behavior:Option[Behaviour.Value]=Option.empty,TTL:Option[String]=Option.empty)
-case class SessionInfo(LockDelay:Double,Checks:Seq[CheckId],Node:NodeId,ID:SessionId,CreateIndex:Long)
-case class SessionIDHolder(ID:SessionId)
 trait SessionRequests {
 
   def create(sessionDef:SessionDef=SessionDef(),dc:Option[String]=Option.empty):Future[SessionIDHolder]
