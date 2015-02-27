@@ -24,7 +24,7 @@ object HealthRequests {
       lazy val params = (if(passing) List(("passing","")) else List.empty ) ++ tag.map{ case tag => (("tag",tag.toString)) }
 
       jsonDcRequestMaker(
-        fullPathFor(s"/service/$service"),dc,
+        fullPathFor(s"service/$service"),dc,
         _.withQueryString(params:_*).get()
       )(_.validate[Seq[NodesHealthService]])
     }
