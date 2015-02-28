@@ -4,6 +4,14 @@ version := "1.0"
 
 scalaVersion := "2.11.1"
 
+resolvers ++= Seq(
+  DefaultMavenRepository,
+  "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
+  "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
+  Classpaths.typesafeReleases,
+  Classpaths.sbtPluginReleases
+)
+
 // Change this to another test framework if you prefer
 libraryDependencies += "org.scalatest"     %% "scalatest" % "2.1.6" % "test"
 
