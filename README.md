@@ -1,4 +1,7 @@
 # scala-consul
+
+[![Codacy Badge](https://www.codacy.com/project/badge/a4df80ffb80d4586a9153afd0e897c21)](https://www.codacy.com)
+
 Scala (http://scala-lang.org/) client for Consul (https://consul.io/)
 
 
