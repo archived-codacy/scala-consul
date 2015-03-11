@@ -15,11 +15,15 @@ trait AclRequests {
   def info(id:AclId):Future[Option[AclInfo]]
   def clone(id:AclId): Future[AclIdResponse]
   def list():Future[Seq[AclInfo]]
+
+  def AclCreate = consul.v1.acl.AclCreate.apply _
+  def AclUpdate = consul.v1.acl.AclUpdate.apply _
+  def AclId     = consul.v1.acl.AclId
 }
 
 object AclRequests{
 
-  def apply(basePath: String)(implicit executionContext: ExecutionContext): AclRequests = new AclRequests {
+  def apply(basePath: String)(implicit executionContext: ExecutionContext): AclRequests = new AclRequests{
 
     def create(acl:AclCreate):Future[AclIdResponse] = erased(
       jsonRequestMaker(createPath,_.put(Json.toJson(acl)))(_.validate[AclIdResponse])

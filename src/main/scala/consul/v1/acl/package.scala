@@ -6,6 +6,7 @@ import play.api.libs.json.Json
 package object acl {
   sealed trait AclIds
   type AclId = WrappedType[String,AclIds]
+  def AclId: String => AclId = WrappedType.apply
 
   case class AclCreate(Name:Option[String],Type:Option[String],Rules:Option[String])
   case class AclUpdate(ID:AclId,Name:Option[String],Type:Option[String],Rules:Option[String])
