@@ -43,7 +43,7 @@ agent.service.register(myService)
 ```
 the check ID of the registered service-check is available via: 
 ```scala
-myService.checkId
+val myCheckId = myService.checkId
 ```
 
 the other 2 types of checks are created with:
