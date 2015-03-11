@@ -54,3 +54,17 @@ and
 ```scala
 agent.service.scriptCheck
 ```
+
+Error Handling: 
+
+All api methods return Futures that can fail. To parse Consul responses Play's Json library is used. 
+In the unlikely case that the client cannot parse the response the Future will fail and you might want to access the JsError
+parsing resulted in. You can do so by recovering the Future: 
+
+```scala
+import consul.v1.common.Types.ConsulResponseParseException
+catalog.nodes().recover{ 
+  case ConsulResponseParseException(jsError) =>  //do something with the JsError
+  case NonFatal(otherException) => //something else
+}
+```
