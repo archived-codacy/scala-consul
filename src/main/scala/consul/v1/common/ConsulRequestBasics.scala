@@ -29,7 +29,7 @@ object ConsulRequestBasics {
     genRequestMaker(path,httpFunc)(_.body)(body)
   }
 
-  def erased[A](future:Future[JsResult[A]])(implicit executionContext: ExecutionContext) = {
+  def erased[A](future:Future[JsResult[A]])(implicit executionContext: ExecutionContext): Future[A] = {
     future.flatMap(_ match{
       case err:JsError      => Future.failed(Types.ConsulResponseParseException(err))
       case JsSuccess(res,_) => Future.successful(res)

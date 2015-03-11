@@ -7,7 +7,9 @@ import play.api.libs.json.{JsNull, Json}
 import scala.concurrent.{ExecutionContext, Future}
 
 trait AclRequests {
+  def create(Name:Option[String]=Option.empty,Type:Option[String]=Option.empty,Rules:Option[String]=Option.empty):Future[AclIdResponse]
   def create(acl:AclCreate):Future[AclIdResponse]
+  def update(ID:AclId,Name:Option[String]=Option.empty,Type:Option[String]=Option.empty,Rules:Option[String]=Option.empty):Future[Boolean]
   def update(acl:AclUpdate):Future[Boolean]
   def destroy(id:AclId):Future[Boolean]
   def info(id:AclId):Future[Option[AclInfo]]
@@ -23,8 +25,15 @@ object AclRequests{
       jsonRequestMaker(createPath,_.put(Json.toJson(acl)))(_.validate[AclIdResponse])
     )
 
+    def create(Name:Option[String],Type:Option[String],Rules:Option[String]):Future[AclIdResponse] = create(
+      AclCreate(Name,Type,Rules)
+    )
+
     def update(acl: AclUpdate): Future[Boolean] =
       responseStatusRequestMaker(updatePath,_.put(Json.toJson(acl)))(_ == Status.OK)
+
+    def update(ID:AclId,Name:Option[String],Type:Option[String],Rules:Option[String]): Future[Boolean] =
+      update(AclUpdate(ID,Name,Type,Rules))
 
     def destroy(id:AclId):Future[Boolean] =
       responseStatusRequestMaker(fullPathFor(s"destroy/$id"),_.put(JsNull))(_ == Status.OK)

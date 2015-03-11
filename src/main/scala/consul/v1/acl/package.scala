@@ -7,7 +7,7 @@ package object acl {
   sealed trait AclIds
   type AclId = WrappedType[String,AclIds]
 
-  case class AclCreate(Name:String,Type:String,Rules:String)
+  case class AclCreate(Name:Option[String],Type:Option[String],Rules:Option[String])
   case class AclUpdate(ID:AclId,Name:Option[String],Type:Option[String],Rules:Option[String])
   case class AclIdResponse(ID:AclId)
   case class AclInfo(CreateIndex: Long, ModifyIndex: Long,ID:AclId,Name:Option[String],Type:Option[String],Rules:Option[String])
