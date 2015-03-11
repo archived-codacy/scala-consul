@@ -2,8 +2,7 @@ package consul.v1.agent.service
 
 import consul.v1.agent.service.LocalService.{apply => applied}
 import consul.v1.common.ConsulRequestBasics._
-import consul.v1.common.Types
-import consul.v1.common.Types.{ServiceId, _}
+import consul.v1.common.Types._
 import play.api.http.Status
 import play.api.libs.json.{Json, Writes}
 
@@ -31,7 +30,7 @@ object ServiceRequests {
 
   def apply(basePath: String)(implicit executionContext: ExecutionContext): ServiceRequests = new ServiceRequests{
 
-    def maintenance(serviceID: Types.ServiceId,enable:Boolean,reason:Option[String]): Future[Boolean] = {
+    def maintenance(serviceID: ServiceId,enable:Boolean,reason:Option[String]): Future[Boolean] = {
       lazy val params = Seq(("enable",enable.toString)) ++ reason.map("reason"->_)
       responseStatusRequestMaker(
         fullPathFor(s"maintenance/$serviceID"),

@@ -15,6 +15,13 @@ trait SessionRequests {
   def node(node:NodeId,dc:Option[DatacenterId]=Option.empty):Future[Seq[SessionInfo]]
   def list(dc:Option[DatacenterId]=Option.empty):Future[Seq[SessionInfo]]
   def renew(id:SessionId,dc:Option[DatacenterId]=Option.empty):Future[Seq[SessionInfo]]
+
+  def SessionDef(LockDelay:Option[String]=Option.empty, Name:Option[String]=Option.empty,
+                 Node:Option[String]=Option.empty, Checks:Option[Seq[CheckId]]=Option.empty,
+                 Behavior:Option[Behaviour.Value]=Option.empty, TTL:Option[String]=Option.empty): SessionDef =
+    consul.v1.session.SessionDef(LockDelay,Name,Node,Checks,Behavior,TTL)
+  def SessionId: (String) => SessionId = consul.v1.session.SessionId
+  lazy val Behavior: Behaviour.type = consul.v1.session.Behaviour
 }
 
 object SessionRequests{
@@ -23,7 +30,7 @@ object SessionRequests{
   private lazy implicit val SessionInfoReads     = Json.reads[SessionInfo]
   private lazy implicit val SessionDefWrites     = Json.writes[SessionDef]
 
-  def apply(basePath: String)(implicit executionContext: ExecutionContext): SessionRequests = new SessionRequests {
+  def apply(basePath: String)(implicit executionContext: ExecutionContext): SessionRequests = new SessionRequests{
 
     def create(sessionDef: SessionDef,dc:Option[DatacenterId]): Future[SessionIDHolder] = erased(
       jsonDcRequestMaker(

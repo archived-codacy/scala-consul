@@ -13,12 +13,12 @@ object KvValue{
   }
 
   implicit val reads = (
-      (__ \ "CreateIndex").read[Int] and
-      (__ \ "ModifyIndex").read[Int] and
-      (__ \ "LockIndex"  ).read[Int] and
-      (__ \ "Key"        ).read[String] and
-      (__ \ "Flags"      ).read[Int] and
-      (__ \ "Value"      ).read(base64valueReads) and
-      (__ \ "Session"    ).readNullable[String]
-    )(KvValue.apply _)
+    (__ \ "CreateIndex").read[Int] and
+    (__ \ "ModifyIndex").read[Int] and
+    (__ \ "LockIndex"  ).read[Int] and
+    (__ \ "Key"        ).read[String] and
+    (__ \ "Flags"      ).read[Int] and
+    (__ \ "Value"      ).read(base64valueReads) and
+    (__ \ "Session"    ).readNullable[String]
+  )(KvValue.apply _)
 }

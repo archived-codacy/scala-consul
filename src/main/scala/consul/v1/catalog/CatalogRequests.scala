@@ -10,12 +10,10 @@ import play.api.libs.ws.WSRequestHolder
 
 import scala.concurrent.{ExecutionContext, Future}
 
-
 case class Deregisterable(Node:NodeId,ServiceID:Option[ServiceId],CheckID:Option[CheckId],Datacenter:Option[DatacenterId])
-
-case class RService(ID:ServiceId,Service:ServiceType,Tags:Set[ServiceTag],Address:Option[String],Port:Option[Int])
-case class RCheck(Node:NodeId,CheckID:CheckId,Name:String,Notes:Option[String],Status:CheckStatus,ServiceID:Option[ServiceId])
-case class Registerable(Node:NodeId,Address:String,Service:Option[RService],Check:Option[RCheck],Datacenter:Option[DatacenterId])
+case class Service(ID:ServiceId,Service:ServiceType,Tags:Set[ServiceTag],Address:Option[String],Port:Option[Int])
+case class Check(Node:NodeId,CheckID:CheckId,Name:String,Notes:Option[String],Status:CheckStatus,ServiceID:Option[ServiceId])
+case class Registerable(Node:NodeId,Address:String,Service:Option[Service],Check:Option[Check],Datacenter:Option[DatacenterId])
 
 trait CatalogRequests {
   def register(registerable:Registerable):Future[Boolean]
@@ -27,12 +25,20 @@ trait CatalogRequests {
   def service(service:ServiceType,tag:Option[ServiceTag]=Option.empty, dc:Option[DatacenterId]=Option.empty):Future[Seq[NodeProvidingService]]
 
   /*convenience methods*/
-  def deregisterNode(node:NodeId,dc:Option[DatacenterId]) =
+  def deregisterNode(node:NodeId,dc:Option[DatacenterId]): Future[Boolean] =
     deregister(Deregisterable(node,Option.empty,Option.empty,dc))
-  def deregisterService(service:ServiceId,node:NodeId,dc:Option[DatacenterId]) =
+  def deregisterService(service:ServiceId,node:NodeId,dc:Option[DatacenterId]): Future[Boolean] =
     deregister(Deregisterable(node,Option(service),Option.empty,dc))
-  def deregisterCheck(check:CheckId,node:NodeId,dc:Option[DatacenterId]) =
+  def deregisterCheck(check:CheckId,node:NodeId,dc:Option[DatacenterId]): Future[Boolean] =
     deregister(Deregisterable(node,Option.empty,Option(check),dc))
+
+  def Registerable: (Types.NodeId, String, Option[Service], Option[Check], Option[Types.DatacenterId]) => Registerable =
+    consul.v1.catalog.Registerable.apply _
+  def Check: (Types.NodeId, Types.CheckId, String, Option[String], CheckStatus, Option[Types.ServiceId]) => Check =
+    consul.v1.catalog.Check.apply _
+  def Service: (Types.ServiceId, Types.ServiceType, Set[Types.ServiceTag], Option[String], Option[Int]) => Service =
+    consul.v1.catalog.Service.apply _
+  def Deregisterable = consul.v1.catalog.Deregisterable.apply _
 
 }
 
@@ -40,8 +46,8 @@ object CatalogRequests {
 
   private implicit lazy val deregisterWrites = Json.writes[Deregisterable]
   private implicit lazy val registerWrites   = {
-    implicit val serviceWrites = Json.writes[RService]
-    implicit val checkWrites = Json.writes[RCheck]
+    implicit val serviceWrites = Json.writes[Service]
+    implicit val checkWrites = Json.writes[Check]
 
     Json.writes[Registerable]
   }

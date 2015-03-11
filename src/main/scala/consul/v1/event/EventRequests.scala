@@ -12,6 +12,8 @@ trait EventRequests {
 
   def fire[T](name:String, payload:T,node:Option[NodeId]=Option.empty,service:Option[ServiceId]=Option.empty, tag:Option[ServiceTag]=Option.empty,dc:Option[DatacenterId]=Option.empty)(implicit wrt: Writeable[T], ct: ContentTypeOf[T]):Future[Event]
   def list(name:Option[String]=Option.empty):Future[List[Event]]
+
+  def EventId: (String) => EventId = consul.v1.event.EventId
 }
 
 object EventRequests{
