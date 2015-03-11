@@ -34,8 +34,23 @@ catalog.nodes().map{ case nodes =>
 }
 ```
 
-Example - register a service on the local node:
+Example - register a service with an http-check on the local node:
 ```scala
-val myService = LocalService(ServiceId("myServiceId"),ServiceType("myTypeOfService"),Set(ServiceTag("MyTag")),Option(9000),Option.empty)
+val myServicePort = 5000
+val myServiceCheck = agent.service.httpCheck(s"http://localhost:$myServicePort/health","15s")
+val myService = agent.service.LocalService(ServiceId("myServiceId"),ServiceType("myTypeOfService"),Set(ServiceTag("MyTag")),Some(myServicePort),Some(myServiceCheck))
 agent.service.register(myService)
+```
+the check ID of the registered service-check is available via: 
+```scala
+myService.checkId
+```
+
+the other 2 types of checks are created with:
+```scala
+agent.service.ttlCheck
+```
+and
+```scala
+agent.service.scriptCheck
 ```
