@@ -1,5 +1,6 @@
 # scala-consul
 
+[![Build Status](https://travis-ci.org/codacy/scala-consul.svg)](https://travis-ci.org/codacy/scala-consul)
 [![Codacy Badge](https://www.codacy.com/project/badge/a4df80ffb80d4586a9153afd0e897c21)](https://www.codacy.com)
 
 An asynchronous Scala (http://scala-lang.org/) client for Consul (https://consul.io/)
