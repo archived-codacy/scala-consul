@@ -51,3 +51,18 @@ description := "Consul Scala Client"
 licenses := Seq("GNU GENERAL PUBLIC LICENSE, Version 3.0" -> url("http://www.gnu.org/licenses/gpl-3.0.txt"))
 
 homepage := Some(url("https://github.com/codacy/scala-consul"))
+
+pomExtra :=
+  <scm>
+    <url>https://github.com/codacy/scala-consul</url>
+    <connection>scm:git:git@github.com:codacy/scala-consul.git</connection>
+    <developerConnection>scm:git:https://github.com/codacy/scala-consul.git</developerConnection>
+  </scm>
+    <developers>
+      <developer>
+        <id>mrfyda</id>
+        <name>Rafael</name>
+        <email>rafael [at] codacy.com</email>
+        <url>https://github.com/mrfyda</url>
+      </developer>
+    </developers>
