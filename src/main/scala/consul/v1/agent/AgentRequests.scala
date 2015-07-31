@@ -47,7 +47,7 @@ object AgentRequests {
 
     def maintenance(enable:Boolean,reason:Option[String]): Future[Boolean] = {
       lazy val params = Seq(("enable",enable.toString)) ++ reason.map("reason"->_)
-      responseStatusRequestMaker( maintenancePath, _.withQueryString(params:_*).get() )(_ == Status.OK)
+      responseStatusRequestMaker( maintenancePath, _.withQueryString(params:_*).put() )(_ == Status.OK)
     }
 
     def checks(): Future[Map[CheckId, Check]] = erased(
