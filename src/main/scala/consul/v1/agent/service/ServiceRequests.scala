@@ -34,7 +34,7 @@ object ServiceRequests {
       lazy val params = Seq(("enable",enable.toString)) ++ reason.map("reason"->_)
       responseStatusRequestMaker(
         fullPathFor(s"maintenance/$serviceID"),
-        _.withQueryString(params:_*).get()
+        _.withQueryString(params:_*).put("")
       )(_ == Status.OK)
     }
 
