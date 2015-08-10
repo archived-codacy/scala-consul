@@ -8,7 +8,7 @@ import consul.v1.common.{Service, Types}
 import consul.v1.common.Types._
 import consul.v1.health.Check
 import play.api.http.Status
-import play.api.libs.json.JsObject
+import play.api.libs.json.{JsNull, JsObject}
 import play.api.libs.ws.WSRequestHolder
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -47,7 +47,7 @@ object AgentRequests {
 
     def maintenance(enable:Boolean,reason:Option[String]): Future[Boolean] = {
       lazy val params = Seq(("enable",enable.toString)) ++ reason.map("reason"->_)
-      responseStatusRequestMaker( maintenancePath, _.withQueryString(params:_*).put("") )(_ == Status.OK)
+      responseStatusRequestMaker( maintenancePath, _.withQueryString(params:_*).put(JsNull) )(_ == Status.OK)
     }
 
     def checks(): Future[Map[CheckId, Check]] = erased(
