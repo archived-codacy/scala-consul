@@ -4,7 +4,7 @@ import consul.v1.agent.service.LocalService.{apply => applied}
 import consul.v1.common.ConsulRequestBasics._
 import consul.v1.common.Types._
 import play.api.http.Status
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{JsNull, Json, Writes}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,7 +34,7 @@ object ServiceRequests {
       lazy val params = Seq(("enable",enable.toString)) ++ reason.map("reason"->_)
       responseStatusRequestMaker(
         fullPathFor(s"maintenance/$serviceID"),
-        _.withQueryString(params:_*).get()
+        _.withQueryString(params:_*).put(JsNull)
       )(_ == Status.OK)
     }
 
