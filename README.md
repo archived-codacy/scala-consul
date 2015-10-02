@@ -69,3 +69,9 @@ catalog.nodes().recover{
   case NonFatal(otherException) => //something else
 }
 ```
+
+### Licence
+This software is licensed under the Apache 2 license:
+http://www.apache.org/licenses/LICENSE-2.0
+
+Copyright (C) 2014 Codacy (https://www.codacy.com)
