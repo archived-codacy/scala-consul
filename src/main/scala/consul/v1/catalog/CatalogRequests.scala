@@ -6,7 +6,7 @@ import consul.v1.common.Types._
 import consul.v1.common.{Node, Types}
 import play.api.http.Status
 import play.api.libs.json._
-import play.api.libs.ws.WSRequestHolder
+import play.api.libs.ws.WSRequest
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -74,7 +74,7 @@ object CatalogRequests {
 
     def service(service: ServiceType, tag:Option[ServiceTag], dc:Option[DatacenterId]) = erased(
       jsonDcRequestMaker(fullPathFor(s"service/$service"),dc,
-        (r:WSRequestHolder) => tag.map{ case tag => r.withQueryString("tag"->tag) }.getOrElse(r).get()
+        (r:WSRequest) => tag.map{ case tag => r.withQueryString("tag"->tag) }.getOrElse(r).get()
       )(_.validate[Seq[NodeProvidingService]])
     )
 

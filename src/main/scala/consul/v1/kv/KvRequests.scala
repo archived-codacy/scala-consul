@@ -3,7 +3,7 @@ package consul.v1.kv
 import consul.v1.common.ConsulRequestBasics._
 import consul.v1.common.Types._
 import play.api.http.{ContentTypeOf, Writeable}
-import play.api.libs.ws.WSRequestHolder
+import play.api.libs.ws.WSRequest
 
 import scala.concurrent.{ExecutionContext, Future}
 trait KvRequests {
@@ -44,7 +44,7 @@ object KvRequests {
 
     private def recurseDcRequestHolder(recurse:Boolean,dc:Option[DatacenterId]) = {
       val params = dc.map("dc"->_.toString).toList ++ Option(recurse).collect{ case true => ("recurse"->"") }
-      (_:WSRequestHolder).withQueryString(params:_*)
+      (_:WSRequest).withQueryString(params:_*)
     }
 
     private def fullPathFor(key: String) = s"$basePath/kv/$key"

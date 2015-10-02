@@ -4,7 +4,7 @@ import consul.v1.common.ConsulRequestBasics._
 import consul.v1.common.Types._
 import play.api.http.{ContentTypeOf, Writeable}
 import play.api.libs.json.Json
-import play.api.libs.ws.WSRequestHolder
+import play.api.libs.ws.WSRequest
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -35,7 +35,7 @@ object EventRequests{
 
     def list(name: Option[String]): Future[List[Event]] = erased(
       jsonRequestMaker(listPath,
-        (r:WSRequestHolder) => name.map{ case name => r.withQueryString("name"->name) }.getOrElse(r).get()
+        (r:WSRequest) => name.map{ case name => r.withQueryString("name"->name) }.getOrElse(r).get()
       )(_.validate[List[Event]])
     )
 
