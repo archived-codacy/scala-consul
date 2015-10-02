@@ -1,6 +1,6 @@
 name := """scala-consul"""
 
-version := "1.0.1"
+version := "1.1.0-SNAPSHOT"
 
 scalaVersion := "2.11.7"
 
