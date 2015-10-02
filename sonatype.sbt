@@ -1,8 +1,8 @@
 // Your profile name of the sonatype account. The default is the same with the organization value
-sonatypeProfileName := "com.sandinh"
+//sonatypeProfileName := "com.sandinh"
 
 pomExtra in Global := {
-  <url>https://github.com/giabao/scala-consul</url>
+  <url>https://github.com/codacy/scala-consul</url>
   <licenses>
     <license>
       <name>Apache 2</name>
@@ -10,9 +10,9 @@ pomExtra in Global := {
     </license>
   </licenses>
   <scm>
-    <url>https://github.com/giabao/scala-consul</url>
-    <connection>scm:git:git@github.com:giabao/scala-consul.git</connection>
-    <developerConnection>scm:git:https://github.com/giabao/scala-consul.git</developerConnection>
+    <url>https://github.com/codacy/scala-consul</url>
+    <connection>scm:git:git@github.com:codacy/scala-consul.git</connection>
+    <developerConnection>scm:git:https://github.com/codacy/scala-consul.git</developerConnection>
   </scm>
   <developers>
     <developer>
