@@ -12,7 +12,7 @@ object StatusRequests{
   def apply(basePath: String)(implicit executionContext: ExecutionContext): StatusRequests = new StatusRequests{
 
     def leader(): Future[Option[String]] = erased(
-      jsonRequestMaker(fullPathFor("leader"),_.get())(_.validate[Option[String]])
+      jsonRequestMaker(fullPathFor("leader"),_.get())(_.validateOpt[String])
     )
 
     def peers(): Future[Seq[String]] = erased(
