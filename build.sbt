@@ -25,44 +25,7 @@ libraryDependencies += "com.typesafe.play" %% "play-ws"   % "2.3.9"
 //libraryDependencies += "com.typesafe.akka" % "akka-actor_2.11" % "2.3.3"
 
 organization := "com.codacy"
-
 organizationName := "Codacy"
-
 organizationHomepage := Some(new URL("https://www.codacy.com"))
 
-publishMavenStyle := true
-
-publishArtifact in Test := false
-
-pomIncludeRepository := { _ => false}
-
-publishTo := {
-  val nexus = "https://oss.sonatype.org/"
-  if (version.value.trim.endsWith("SNAPSHOT"))
-    Some("snapshots" at nexus + "content/repositories/snapshots")
-  else
-    Some("releases" at nexus + "service/local/staging/deploy/maven2")
-}
-
-startYear := Some(2014)
-
 description := "Consul Scala Client"
-
-licenses := Seq("GNU GENERAL PUBLIC LICENSE, Version 3.0" -> url("http://www.gnu.org/licenses/gpl-3.0.txt"))
-
-homepage := Some(url("https://github.com/codacy/scala-consul"))
-
-pomExtra :=
-  <scm>
-    <url>https://github.com/codacy/scala-consul</url>
-    <connection>scm:git:git@github.com:codacy/scala-consul.git</connection>
-    <developerConnection>scm:git:https://github.com/codacy/scala-consul.git</developerConnection>
-  </scm>
-    <developers>
-      <developer>
-        <id>mrfyda</id>
-        <name>Rafael</name>
-        <email>rafael [at] codacy.com</email>
-        <url>https://github.com/mrfyda</url>
-      </developer>
-    </developers>
