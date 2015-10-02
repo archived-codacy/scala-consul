@@ -4,25 +4,20 @@ version := "1.1.0-SNAPSHOT"
 
 scalaVersion := "2.11.7"
 
-crossScalaVersions  := Seq("2.10.5", "2.11.6")
+crossScalaVersions := Seq(scalaVersion.value)
 
-resolvers ++= Seq(
-  DefaultMavenRepository,
-  "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-  "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
-  Classpaths.typesafeReleases,
-  Classpaths.sbtPluginReleases
+scalacOptions ++= Seq(
+  "-encoding", "UTF-8", "-deprecation", "-feature"
+  ,"-Xfuture" //, "-Xverify", "-Xcheck-null"
+  ,"-Ybackend:GenBCode"
+  ,"-Ydelambdafy:method"
 )
 
-// Change this to another test framework if you prefer
-libraryDependencies += "org.scalatest"     %% "scalatest" % "2.1.6" % "test"
-
-libraryDependencies += "com.typesafe.play" %% "play-json" % "2.3.9"
-
-libraryDependencies += "com.typesafe.play" %% "play-ws"   % "2.3.9"
-
-// Uncomment to use Akka
-//libraryDependencies += "com.typesafe.akka" % "akka-actor_2.11" % "2.3.3"
+libraryDependencies ++= Seq(
+  "org.scalatest"     %% "scalatest" % "2.2.5" % Test,
+  "com.typesafe.play" %% "play-json" % "2.4.3",
+  "com.typesafe.play" %% "play-ws"   % "2.4.3"
+)
 
 organization := "com.codacy"
 organizationName := "Codacy"
