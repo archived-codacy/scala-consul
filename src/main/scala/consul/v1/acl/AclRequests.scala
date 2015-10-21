@@ -47,7 +47,7 @@ object AclRequests{
     )
 
     def info(id:AclId): Future[Option[AclInfo]] = erased(
-      jsonRequestMaker(fullPathFor(s"info/$id"),_.get())(_.validate[Option[AclInfo]])
+      jsonRequestMaker(fullPathFor(s"info/$id"),_.get())(_.validateOpt[AclInfo])
     )
 
     def clone(id:AclId): Future[AclIdResponse] = erased(

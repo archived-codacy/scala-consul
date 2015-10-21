@@ -4,7 +4,7 @@ import consul.v1.common.ConsulRequestBasics._
 import consul.v1.common.Types.CheckId
 import play.api.http.Status
 import play.api.libs.json.{Writes, Json}
-import play.api.libs.ws.WSRequestHolder
+import play.api.libs.ws.WSRequest
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -65,7 +65,7 @@ object CheckRequests{
     private def functionForStatus(status:String) = (checkId: CheckId,note:Option[String]) =>
       responseStatusRequestMaker(
         fullPathFor(s"$status/$checkId"),
-        (r:WSRequestHolder) => note.map{ case note => r.withQueryString("note"->note) }.getOrElse( r ).get()
+        (r:WSRequest) => note.map{ case note => r.withQueryString("note"->note) }.getOrElse( r ).get()
       )(_ == Status.OK)
 
     private def fullPathFor(path: String) = s"$basePath/check/$path"

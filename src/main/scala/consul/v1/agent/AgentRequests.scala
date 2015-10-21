@@ -9,7 +9,7 @@ import consul.v1.common.Types._
 import consul.v1.health.Check
 import play.api.http.Status
 import play.api.libs.json.{JsNull, JsObject}
-import play.api.libs.ws.WSRequestHolder
+import play.api.libs.ws.WSRequest
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -38,7 +38,7 @@ object AgentRequests {
 
     def join(address: String,wan:Boolean): Future[Boolean] = responseStatusRequestMaker(
       fullPathFor(s"join/$address"),
-      (r:WSRequestHolder) => (if(wan) r.withQueryString(("wan","1")) else r).get()
+      (r:WSRequest) => (if(wan) r.withQueryString(("wan","1")) else r).get()
     )( _ == Status.OK )
 
     def `force-leave`(node: Types.NodeId): Future[Boolean] = responseStatusRequestMaker(
