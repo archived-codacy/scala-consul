@@ -19,7 +19,7 @@ object HealthRequests {
   implicit private val NodesHealthServiceReads: Reads[NodesHealthService] = Json.reads[NodesHealthService]
 
   def apply(basePath: String)(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics): HealthRequests = new HealthRequests {
-    def service(service: ServiceType, tag:Option[ServiceTag], passing:Boolean=false,dc:Option[DatacenterId]): Future[Seq[NodesHealthService]] = erased{
+    def service(service: ServiceType, tag:Option[ServiceTag], passing:Boolean=false,dc:Option[DatacenterId]): Future[Seq[NodesHealthService]] = rb.erased{
       lazy val params = (if(passing) List(("passing","")) else List.empty ) ++ tag.map{ case tag => (("tag",tag.toString)) }
 
       rb.jsonDcRequestMaker(
