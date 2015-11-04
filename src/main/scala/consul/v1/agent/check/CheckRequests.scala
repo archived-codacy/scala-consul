@@ -1,6 +1,6 @@
 package consul.v1.agent.check
 
-import consul.v1.common.ConsulRequestBasics._
+import consul.v1.common.ConsulRequestBasics
 import consul.v1.common.Types.CheckId
 import play.api.http.Status
 import play.api.libs.json.{Writes, Json}
@@ -46,7 +46,9 @@ trait CheckRequests extends CheckCreators{
 
 object CheckRequests{
 
-  def apply(basePath: String)(implicit executionContext: ExecutionContext): CheckRequests = new CheckRequests {
+  def apply(basePath: String)(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics): CheckRequests = new CheckRequests {
+
+    import rb._
 
     def register(check: Check): Future[Boolean] = responseStatusRequestMaker(
       registerPath,_.put(Json.toJson(check))

@@ -1,6 +1,6 @@
 package consul.v1.event
 
-import consul.v1.common.ConsulRequestBasics._
+import consul.v1.common.ConsulRequestBasics
 import consul.v1.common.Types._
 import play.api.http.{ContentTypeOf, Writeable}
 import play.api.libs.json.Json
@@ -20,7 +20,9 @@ object EventRequests{
 
   private implicit lazy val eventReads = Json.reads[Event]
 
-  def apply(basePath: String)(implicit executionContext: ExecutionContext):EventRequests = new EventRequests {
+  def apply(basePath: String)(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics):EventRequests = new EventRequests {
+
+    import rb._
 
     def fire[T](name:String, payload:T,node:Option[NodeId],service:Option[ServiceId],tag:Option[ServiceTag],dc:Option[DatacenterId])(
                 implicit wrt: Writeable[T], ct: ContentTypeOf[T]):Future[Event] = {

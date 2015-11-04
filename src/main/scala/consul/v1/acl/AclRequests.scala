@@ -1,6 +1,6 @@
 package consul.v1.acl
 
-import consul.v1.common.ConsulRequestBasics._
+import consul.v1.common.ConsulRequestBasics
 import play.api.http.Status
 import play.api.libs.json.{JsNull, Json}
 
@@ -23,7 +23,9 @@ trait AclRequests {
 
 object AclRequests{
 
-  def apply(basePath: String)(implicit executionContext: ExecutionContext): AclRequests = new AclRequests{
+  def apply(basePath: String)(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics): AclRequests = new AclRequests{
+
+    import rb._
 
     def create(acl:AclCreate):Future[AclIdResponse] = erased(
       jsonRequestMaker(createPath,_.put(Json.toJson(acl)))(_.validate[AclIdResponse])

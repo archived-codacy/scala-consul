@@ -1,9 +1,8 @@
 package consul.v1.catalog
 
 import consul.v1.common.CheckStatus._
-import consul.v1.common.ConsulRequestBasics._
 import consul.v1.common.Types._
-import consul.v1.common.{Node, Types}
+import consul.v1.common.{ConsulRequestBasics, Node, Types}
 import play.api.http.Status
 import play.api.libs.json._
 import play.api.libs.ws.WSRequest
@@ -52,7 +51,9 @@ object CatalogRequests {
     Json.writes[Registerable]
   }
 
-  def apply(basePath: String)(implicit executionContext: ExecutionContext): CatalogRequests = new CatalogRequests {
+  def apply(basePath: String)(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics): CatalogRequests = new CatalogRequests {
+
+    import rb._
 
     def register(registerable: Registerable): Future[Boolean] = responseStatusRequestMaker(
       registerPath,

@@ -3,8 +3,7 @@ package consul.v1.agent
 import consul.v1.agent.check.CheckRequests
 import consul.v1.agent.service.ServiceRequests
 
-import consul.v1.common.ConsulRequestBasics._
-import consul.v1.common.{Service, Types}
+import consul.v1.common.{ConsulRequestBasics, Service, Types}
 import consul.v1.common.Types._
 import consul.v1.health.Check
 import play.api.http.Status
@@ -30,7 +29,9 @@ trait AgentRequests {
 
 object AgentRequests {
 
-  def apply(basePath: String)(implicit executionContext: ExecutionContext): AgentRequests = new AgentRequests {
+  def apply(basePath: String)(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics): AgentRequests = new AgentRequests {
+
+    import rb._
 
     def self() = erased(
       jsonRequestMaker(fullPathFor("self"), _.get())(_.validate[JsObject])

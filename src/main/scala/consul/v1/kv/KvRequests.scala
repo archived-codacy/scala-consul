@@ -1,6 +1,6 @@
 package consul.v1.kv
 
-import consul.v1.common.ConsulRequestBasics._
+import consul.v1.common.ConsulRequestBasics
 import consul.v1.common.Types._
 import play.api.http.{ContentTypeOf, Writeable}
 import play.api.libs.ws.WSRequest
@@ -16,7 +16,9 @@ trait KvRequests {
 
 object KvRequests {
 
-  def apply(basePath: String)(implicit executionContext: ExecutionContext): KvRequests = new KvRequests{
+  def apply(basePath: String)(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics): KvRequests = new KvRequests{
+
+    import rb._
 
     def get(key: String,recurse:Boolean,dc:Option[DatacenterId]) = erased(
       jsonRequestMaker(
