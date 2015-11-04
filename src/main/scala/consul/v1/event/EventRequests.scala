@@ -22,21 +22,19 @@ object EventRequests{
 
   def apply(basePath: String)(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics):EventRequests = new EventRequests {
 
-    import rb._
-
     def fire[T](name:String, payload:T,node:Option[NodeId],service:Option[ServiceId],tag:Option[ServiceTag],dc:Option[DatacenterId])(
                 implicit wrt: Writeable[T], ct: ContentTypeOf[T]):Future[Event] = {
 
       val params = node.map("node"->_.toString).toList ++ service.map("service"->_.toString) ++ tag.map("tag"->_.toString)
-      erased(
-        jsonDcRequestMaker(fullPathFor(s"fire/$name"),dc,
+      rb.erased(
+        rb.jsonDcRequestMaker(fullPathFor(s"fire/$name"),dc,
           _.withQueryString(params:_*).put(payload)
         )(_.validate[Event])
       )
     }
 
-    def list(name: Option[String]): Future[List[Event]] = erased(
-      jsonRequestMaker(listPath,
+    def list(name: Option[String]): Future[List[Event]] = rb.erased(
+      rb.jsonRequestMaker(listPath,
         (r:WSRequest) => name.map{ case name => r.withQueryString("name"->name) }.getOrElse(r).get()
       )(_.validate[List[Event]])
     )

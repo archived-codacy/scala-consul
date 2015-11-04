@@ -32,39 +32,37 @@ object SessionRequests{
 
   def apply(basePath: String)(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics): SessionRequests = new SessionRequests{
 
-    import rb._
-
-    def create(sessionDef: SessionDef,dc:Option[DatacenterId]): Future[SessionIDHolder] = erased(
-      jsonDcRequestMaker(
+    def create(sessionDef: SessionDef,dc:Option[DatacenterId]): Future[SessionIDHolder] = rb.erased(
+      rb.jsonDcRequestMaker(
         createPath,dc,
         _.put(Json.toJson(sessionDef))
       )(_.validate[SessionIDHolder])
     )
 
-    def node(node:NodeId,dc:Option[DatacenterId]=Option.empty):Future[Seq[SessionInfo]] = erased(
-      jsonDcRequestMaker(
+    def node(node:NodeId,dc:Option[DatacenterId]=Option.empty):Future[Seq[SessionInfo]] = rb.erased(
+      rb.jsonDcRequestMaker(
         fullPathFor(s"node/$node"),dc,_.get
       )( _.validate[Seq[SessionInfo]] )
     )
 
-    def destroy(id:SessionId,dc:Option[DatacenterId]):Future[Boolean] = responseStatusDcRequestMaker(
+    def destroy(id:SessionId,dc:Option[DatacenterId]):Future[Boolean] = rb.responseStatusDcRequestMaker(
       fullPathFor(s"destroy/$id"),dc,_.put("")
     )(_ == Status.OK)
 
-    def list(dc:Option[DatacenterId]):Future[Seq[SessionInfo]] = erased(
-      jsonDcRequestMaker(
+    def list(dc:Option[DatacenterId]):Future[Seq[SessionInfo]] = rb.erased(
+      rb.jsonDcRequestMaker(
         listPath,dc,_.get
       )(_.validate[Seq[SessionInfo]])
     )
 
-    def renew(id:SessionId,dc:Option[DatacenterId]=Option.empty):Future[Seq[SessionInfo]] = erased(
-      jsonDcRequestMaker(
+    def renew(id:SessionId,dc:Option[DatacenterId]=Option.empty):Future[Seq[SessionInfo]] = rb.erased(
+      rb.jsonDcRequestMaker(
         fullPathFor(s"renew/$id"),dc,_.put("")
       )(_.validate[Seq[SessionInfo]])
     )
 
-    def info(id:SessionId,dc:Option[DatacenterId]=Option.empty):Future[Seq[SessionInfo]] = erased(
-      jsonDcRequestMaker(
+    def info(id:SessionId,dc:Option[DatacenterId]=Option.empty):Future[Seq[SessionInfo]] = rb.erased(
+      rb.jsonDcRequestMaker(
         fullPathFor(s"info/$id"),dc,_.get
       )( _.validate[Seq[SessionInfo]] )
     )

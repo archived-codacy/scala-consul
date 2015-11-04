@@ -31,34 +31,32 @@ object AgentRequests {
 
   def apply(basePath: String)(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics): AgentRequests = new AgentRequests {
 
-    import rb._
-
-    def self() = erased(
-      jsonRequestMaker(fullPathFor("self"), _.get())(_.validate[JsObject])
+    def self() = rb.erased(
+      rb.jsonRequestMaker(fullPathFor("self"), _.get())(_.validate[JsObject])
     )
 
-    def join(address: String,wan:Boolean): Future[Boolean] = responseStatusRequestMaker(
+    def join(address: String,wan:Boolean): Future[Boolean] = rb.responseStatusRequestMaker(
       fullPathFor(s"join/$address"),
       (r:WSRequest) => (if(wan) r.withQueryString(("wan","1")) else r).get()
     )( _ == Status.OK )
 
-    def `force-leave`(node: Types.NodeId): Future[Boolean] = responseStatusRequestMaker(
+    def `force-leave`(node: Types.NodeId): Future[Boolean] = rb.responseStatusRequestMaker(
       fullPathFor(s"force-leave/$node"),_.get()
     )( _ == Status.OK )
 
     def maintenance(enable:Boolean,reason:Option[String]): Future[Boolean] = {
       lazy val params = Seq(("enable",enable.toString)) ++ reason.map("reason"->_)
-      responseStatusRequestMaker( maintenancePath, _.withQueryString(params:_*).put(JsNull) )(_ == Status.OK)
+      rb.responseStatusRequestMaker( maintenancePath, _.withQueryString(params:_*).put(JsNull) )(_ == Status.OK)
     }
 
-    def checks(): Future[Map[CheckId, Check]] = erased(
-      jsonRequestMaker(checksPath, _.get() )(
+    def checks(): Future[Map[CheckId, Check]] = rb.erased(
+      rb.jsonRequestMaker(checksPath, _.get() )(
         _.validate[Map[String,Check]].map(_.map{ case (key,value) => CheckId(key)->value })
       )
     )
 
-    def services(): Future[Map[ServiceId,Service]] = erased(
-      jsonRequestMaker(servicesPath, _.get() )(
+    def services(): Future[Map[ServiceId,Service]] = rb.erased(
+      rb.jsonRequestMaker(servicesPath, _.get() )(
         _.validate[Map[String,Service]].map(_.map{ case (key,value) => ServiceId(key)->value })
       )
     )

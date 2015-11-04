@@ -48,13 +48,11 @@ object CheckRequests{
 
   def apply(basePath: String)(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics): CheckRequests = new CheckRequests {
 
-    import rb._
-
-    def register(check: Check): Future[Boolean] = responseStatusRequestMaker(
+    def register(check: Check): Future[Boolean] = rb.responseStatusRequestMaker(
       registerPath,_.put(Json.toJson(check))
     )(_ == Status.OK)
 
-    def deregister(checkId: CheckId): Future[Boolean] = responseStatusRequestMaker(
+    def deregister(checkId: CheckId): Future[Boolean] = rb.responseStatusRequestMaker(
       fullPathFor(s"deregister/$checkId"),_.get()
     )(_ == Status.OK)
 
@@ -65,7 +63,7 @@ object CheckRequests{
     def fail(checkId: CheckId,note:Option[String]): Future[Boolean] = functionForStatus("fail")(checkId,note)
 
     private def functionForStatus(status:String) = (checkId: CheckId,note:Option[String]) =>
-      responseStatusRequestMaker(
+      rb.responseStatusRequestMaker(
         fullPathFor(s"$status/$checkId"),
         (r:WSRequest) => note.map{ case note => r.withQueryString("note"->note) }.getOrElse( r ).get()
       )(_ == Status.OK)
