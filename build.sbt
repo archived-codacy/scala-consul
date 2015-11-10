@@ -16,7 +16,8 @@ scalacOptions ++= Seq(
 libraryDependencies ++= Seq(
   "org.scalatest"     %% "scalatest" % "2.2.5" % Test,
   "com.typesafe.play" %% "play-json" % "2.4.3",
-  "com.typesafe.play" %% "play-ws"   % "2.4.3"
+  "com.typesafe.play" %% "play-ws"   % "2.4.3",
+  "org.scalatest" %% "scalatest" % "2.2.4" % "test"
 )
 
 organization := "com.codacy"
