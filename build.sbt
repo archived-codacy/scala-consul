@@ -13,11 +13,11 @@ scalacOptions ++= Seq(
   ,"-Ydelambdafy:method"
 )
 
+resolvers += "Bintray Typesafe Repo" at "http://dl.bintray.com/typesafe/maven-releases/"
+
 libraryDependencies ++= Seq(
-  "org.scalatest"     %% "scalatest" % "2.2.5" % Test,
   "com.typesafe.play" %% "play-json" % "2.4.3",
-  "com.typesafe.play" %% "play-ws"   % "2.4.3",
-  "org.scalatest" %% "scalatest" % "2.2.4" % "test"
+  "com.typesafe.play" %% "play-ws"   % "2.4.3"
 )
 
 organization := "com.codacy"
