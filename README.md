@@ -1,7 +1,6 @@
 # scala-consul
 
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/1edaae77fef941c39b446b6df8877183)](https://www.codacy.com/app/Codacy/scala-consul)
-[![Codacy Badge](https://api.codacy.com/project/badge/coverage/1edaae77fef941c39b446b6df8877183)](https://www.codacy.com/app/Codacy/scala-consul)
 [![Circle CI](https://circleci.com/gh/codacy/scala-consul.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/codacy/scala-consul)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.codacy/scala-consul_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.codacy/scala-consul_2.11)
 
