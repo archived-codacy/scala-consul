@@ -1,7 +1,7 @@
 package consul.v1.agent.service
 
 import consul.v1.agent.service.LocalService.{apply => applied}
-import consul.v1.common.ConsulRequestBasics._
+import consul.v1.common.ConsulRequestBasics
 import consul.v1.common.Types._
 import play.api.http.Status
 import play.api.libs.json.{JsNull, Json, Writes}
@@ -28,21 +28,21 @@ object ServiceRequests {
 
   private implicit lazy val CheckWrites: Writes[Check] = Json.writes[Check]
 
-  def apply(basePath: String)(implicit executionContext: ExecutionContext): ServiceRequests = new ServiceRequests{
+  def apply(basePath: String)(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics): ServiceRequests = new ServiceRequests{
 
     def maintenance(serviceID: ServiceId,enable:Boolean,reason:Option[String]): Future[Boolean] = {
       lazy val params = Seq(("enable",enable.toString)) ++ reason.map("reason"->_)
-      responseStatusRequestMaker(
+      rb.responseStatusRequestMaker(
         fullPathFor(s"maintenance/$serviceID"),
         _.withQueryString(params:_*).put(JsNull)
       )(_ == Status.OK)
     }
 
     def register(localService: LocalService): Future[Boolean] =
-      responseStatusRequestMaker(fullPathFor("register"), _.put(Json.toJson(localService)))(_ == Status.OK)
+      rb.responseStatusRequestMaker(fullPathFor("register"), _.put(Json.toJson(localService)))(_ == Status.OK)
 
     def deregister(serviceID: ServiceId): Future[Boolean] =
-      responseStatusRequestMaker(fullPathFor(s"deregister/$serviceID"), _.get())(_ == Status.OK)
+      rb.responseStatusRequestMaker(fullPathFor(s"deregister/$serviceID"), _.get())(_ == Status.OK)
 
     private def fullPathFor(path: String) = s"$basePath/service/$path"
 

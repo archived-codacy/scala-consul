@@ -7,25 +7,28 @@ import play.api.Play.current
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
-object ConsulRequestBasics {
+class ConsulRequestBasics(token: Option[String]) {
 
-  def jsonRequestMaker[A](path: String, httpFunc: WSRequest => Future[WSResponse])(body: JsValue => A)(implicit executionContext: ExecutionContext): Future[A] = {
+  type HttpFunc = WSRequest => Future[WSResponse]
+  type RequestTransformer = WSRequest => WSRequest
+
+  def jsonRequestMaker[A](path: String, httpFunc: HttpFunc)(body: JsValue => A)(implicit executionContext: ExecutionContext): Future[A] = {
     genRequestMaker(path,httpFunc)(_.json)(body)
   }
 
-  def jsonDcRequestMaker[A](path: String, dc:Option[DatacenterId], httpFunc: WSRequest => Future[WSResponse])(body: JsValue => A)(implicit executionContext: ExecutionContext): Future[A] = {
-    jsonRequestMaker(path, withDc(httpFunc,dc))(body)
+  def jsonDcRequestMaker[A](path: String, dc:Option[DatacenterId], httpFunc: HttpFunc)(body: JsValue => A)(implicit executionContext: ExecutionContext): Future[A] = {
+    jsonRequestMaker(path, withDc(dc).andThen(httpFunc))(body)
   }
 
-  def responseStatusRequestMaker[A](path: String, httpFunc: WSRequest => Future[WSResponse])(body: Int => A)(implicit executionContext: ExecutionContext): Future[A] = {
+  def responseStatusRequestMaker[A](path: String, httpFunc: HttpFunc)(body: Int => A)(implicit executionContext: ExecutionContext): Future[A] = {
     genRequestMaker(path,httpFunc)(_.status)(body)
   }
 
-  def responseStatusDcRequestMaker[A](path: String, dc:Option[DatacenterId], httpFunc: WSRequest => Future[WSResponse])(body: Int => A)(implicit executionContext: ExecutionContext): Future[A] = {
-    responseStatusRequestMaker(path, withDc(httpFunc,dc))(body)
+  def responseStatusDcRequestMaker[A](path: String, dc:Option[DatacenterId], httpFunc: HttpFunc)(body: Int => A)(implicit executionContext: ExecutionContext): Future[A] = {
+    responseStatusRequestMaker(path, withDc(dc).andThen(httpFunc))(body)
   }
 
-  def stringRequestMaker[A](path: String, httpFunc: WSRequest => Future[WSResponse])(body: String => A)(implicit executionContext: ExecutionContext): Future[A] = {
+  def stringRequestMaker[A](path: String, httpFunc: HttpFunc)(body: String => A)(implicit executionContext: ExecutionContext): Future[A] = {
     genRequestMaker(path,httpFunc)(_.body)(body)
   }
 
@@ -36,15 +39,18 @@ object ConsulRequestBasics {
     }
   }
 
-  private def genRequestMaker[A,B](path: String, httpFunc: WSRequest => Future[WSResponse])(responseTransformer: WSResponse => B)(body: B => A)(implicit executionContext: ExecutionContext): Future[A] = {
-
-    Try(httpFunc(WS.url(path))) match {
+  private def genRequestMaker[A,B](path: String, httpFunc: HttpFunc)(responseTransformer: WSResponse => B)(body: B => A)(implicit executionContext: ExecutionContext): Future[A] = {
+    Try((withToken(token) andThen httpFunc)(WS.url(path))) match {
       case Failure(exception) => Future.failed(exception)
       case Success(resultF)   => resultF.map( responseTransformer andThen body )
     }
   }
 
-  private def withDc(httpFunc: WSRequest => Future[WSResponse],dc:Option[DatacenterId]) = {
-    (req:WSRequest) => httpFunc(dc.map{ v => req.withQueryString("dc" -> v.toString) }.getOrElse(req))
+  private def withToken(token: Option[String]): RequestTransformer = {
+    token.map(t => (req: WSRequest) => req.withQueryString("token" -> t)).getOrElse(identity)
+  }
+
+  private def withDc(dc: Option[DatacenterId]): RequestTransformer = {
+    dc.map(v => (req: WSRequest) => req.withQueryString("dc" -> v.toString)).getOrElse(identity)
   }
 }

@@ -1,6 +1,6 @@
 package consul.v1.kv
 
-import consul.v1.common.ConsulRequestBasics._
+import consul.v1.common.ConsulRequestBasics
 import consul.v1.common.Types._
 import play.api.http.{ContentTypeOf, Writeable}
 import play.api.libs.ws.WSRequest
@@ -16,10 +16,10 @@ trait KvRequests {
 
 object KvRequests {
 
-  def apply(basePath: String)(implicit executionContext: ExecutionContext): KvRequests = new KvRequests{
+  def apply(basePath: String)(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics): KvRequests = new KvRequests{
 
-    def get(key: String,recurse:Boolean,dc:Option[DatacenterId]) = erased(
-      jsonRequestMaker(
+    def get(key: String,recurse:Boolean,dc:Option[DatacenterId]) = rb.erased(
+      rb.jsonRequestMaker(
         fullPathFor(key),
         httpFunc = recurseDcRequestHolder(recurse,dc).andThen( _.get() )
       )(_.validateOpt[List[KvValue]].map(_.getOrElse(List.empty)))
@@ -29,15 +29,14 @@ object KvRequests {
       //this could be wrong - could be a simple string that is returned and we have to check if "true" or "false"
       val params = flags.map("flags"->_.toString).toList ++ acquire.map("acquire"->_.toString) ++ release.map("release"->_)
 
-      jsonDcRequestMaker(
+      rb.jsonDcRequestMaker(
         fullPathFor(key),dc,
         httpFunc = _.withQueryString(params:_*).put(value)
       )(_.validate[Boolean].getOrElse(false))
     }
 
     def delete(key: String, recurse: Boolean, dc:Option[DatacenterId]): Future[Boolean] = {
-
-      responseStatusRequestMaker(fullPathFor(key),
+      rb.responseStatusRequestMaker(fullPathFor(key),
        httpFunc = recurseDcRequestHolder(recurse,dc).andThen( _.delete() )
       )(_ => true)
     }

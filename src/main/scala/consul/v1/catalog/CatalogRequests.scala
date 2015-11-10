@@ -1,9 +1,8 @@
 package consul.v1.catalog
 
 import consul.v1.common.CheckStatus._
-import consul.v1.common.ConsulRequestBasics._
 import consul.v1.common.Types._
-import consul.v1.common.{Node, Types}
+import consul.v1.common.{ConsulRequestBasics, Node, Types}
 import play.api.http.Status
 import play.api.libs.json._
 import play.api.libs.ws.WSRequest
@@ -52,38 +51,38 @@ object CatalogRequests {
     Json.writes[Registerable]
   }
 
-  def apply(basePath: String)(implicit executionContext: ExecutionContext): CatalogRequests = new CatalogRequests {
+  def apply(basePath: String)(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics): CatalogRequests = new CatalogRequests {
 
-    def register(registerable: Registerable): Future[Boolean] = responseStatusRequestMaker(
+    def register(registerable: Registerable): Future[Boolean] = rb.responseStatusRequestMaker(
       registerPath,
       _.put( Json.toJson(registerable) )
     )(_ == Status.OK)
 
-    def deregister(deregisterable:Deregisterable):Future[Boolean] = responseStatusRequestMaker(
+    def deregister(deregisterable:Deregisterable):Future[Boolean] = rb.responseStatusRequestMaker(
       deregisterPath,
       _.put(Json.toJson(deregisterable))
     )(_ == Status.OK)
 
-    def nodes(dc:Option[DatacenterId]) = erased(
-      jsonDcRequestMaker(fullPathFor("nodes"),dc, _.get())(_.validate[Seq[Node]])
+    def nodes(dc:Option[DatacenterId]) = rb.erased(
+      rb.jsonDcRequestMaker(fullPathFor("nodes"),dc, _.get())(_.validate[Seq[Node]])
     )
 
-    def node(nodeID: NodeId, dc:Option[DatacenterId]) = erased(
-      jsonDcRequestMaker(fullPathFor(s"node/$nodeID"),dc, _.get())(_.validate[NodeProvidedServices])
+    def node(nodeID: NodeId, dc:Option[DatacenterId]) = rb.erased(
+      rb.jsonDcRequestMaker(fullPathFor(s"node/$nodeID"),dc, _.get())(_.validate[NodeProvidedServices])
     )
 
-    def service(service: ServiceType, tag:Option[ServiceTag], dc:Option[DatacenterId]) = erased(
-      jsonDcRequestMaker(fullPathFor(s"service/$service"),dc,
+    def service(service: ServiceType, tag:Option[ServiceTag], dc:Option[DatacenterId]) = rb.erased(
+      rb.jsonDcRequestMaker(fullPathFor(s"service/$service"),dc,
         (r:WSRequest) => tag.map{ case tag => r.withQueryString("tag"->tag) }.getOrElse(r).get()
       )(_.validate[Seq[NodeProvidingService]])
     )
 
-    def datacenters(): Future[Seq[DatacenterId]] = erased(
-      jsonRequestMaker(datacenterPath, _.get() )(_.validate[Seq[DatacenterId]])
+    def datacenters(): Future[Seq[DatacenterId]] = rb.erased(
+      rb.jsonRequestMaker(datacenterPath, _.get() )(_.validate[Seq[DatacenterId]])
     )
 
-    def services(dc:Option[DatacenterId]=Option.empty): Future[Map[Types.ServiceType, Set[String]]] = erased(
-      jsonDcRequestMaker(servicesPath, dc, _.get())(
+    def services(dc:Option[DatacenterId]=Option.empty): Future[Map[Types.ServiceType, Set[String]]] = rb.erased(
+      rb.jsonDcRequestMaker(servicesPath, dc, _.get())(
         _.validate[Map[String,Set[String]]].map(_.map{ case (key,value) => ServiceType(key)->value })
       )
     )
