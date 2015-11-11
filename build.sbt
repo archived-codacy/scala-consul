@@ -17,7 +17,8 @@ resolvers += "Bintray Typesafe Repo" at "http://dl.bintray.com/typesafe/maven-re
 
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.4.3",
-  "com.typesafe.play" %% "play-ws"   % "2.4.3"
+  "com.typesafe.play" %% "play-ws"   % "2.4.3",
+  "com.codacy" %% "coverage-parser" % "1.1.1"
 )
 
 organization := "com.codacy"
