@@ -51,48 +51,41 @@ object CatalogRequests {
     Json.writes[Registerable]
   }
 
-  def apply(basePath: String)(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics): CatalogRequests = new CatalogRequests {
+  def apply()(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics): CatalogRequests = new CatalogRequests {
 
     def register(registerable: Registerable): Future[Boolean] = rb.responseStatusRequestMaker(
-      registerPath,
+      "/catalog/register",
       _.put( Json.toJson(registerable) )
     )(_ == Status.OK)
 
     def deregister(deregisterable:Deregisterable):Future[Boolean] = rb.responseStatusRequestMaker(
-      deregisterPath,
+      "/catalog/deregister",
       _.put(Json.toJson(deregisterable))
     )(_ == Status.OK)
 
     def nodes(dc:Option[DatacenterId]) = rb.erased(
-      rb.jsonDcRequestMaker(fullPathFor("nodes"),dc, _.get())(_.validate[Seq[Node]])
+      rb.jsonDcRequestMaker("/catalog/nodes",dc, _.get())(_.validate[Seq[Node]])
     )
 
     def node(nodeID: NodeId, dc:Option[DatacenterId]) = rb.erased(
-      rb.jsonDcRequestMaker(fullPathFor(s"node/$nodeID"),dc, _.get())(_.validate[NodeProvidedServices])
+      rb.jsonDcRequestMaker(s"/catalog/node/$nodeID",dc, _.get())(_.validate[NodeProvidedServices])
     )
 
     def service(service: ServiceType, tag:Option[ServiceTag], dc:Option[DatacenterId]) = rb.erased(
-      rb.jsonDcRequestMaker(fullPathFor(s"service/$service"),dc,
+      rb.jsonDcRequestMaker(s"/catalog/service/$service",dc,
         (r:WSRequest) => tag.map{ case tag => r.withQueryString("tag"->tag) }.getOrElse(r).get()
       )(_.validate[Seq[NodeProvidingService]])
     )
 
     def datacenters(): Future[Seq[DatacenterId]] = rb.erased(
-      rb.jsonRequestMaker(datacenterPath, _.get() )(_.validate[Seq[DatacenterId]])
+      rb.jsonRequestMaker("/catalog/datacenters", _.get() )(_.validate[Seq[DatacenterId]])
     )
 
     def services(dc:Option[DatacenterId]=Option.empty): Future[Map[Types.ServiceType, Set[String]]] = rb.erased(
-      rb.jsonDcRequestMaker(servicesPath, dc, _.get())(
+      rb.jsonDcRequestMaker("/catalog/services", dc, _.get())(
         _.validate[Map[String,Set[String]]].map(_.map{ case (key,value) => ServiceType(key)->value })
       )
     )
-
-    private lazy val datacenterPath = fullPathFor("datacenters")
-    private lazy val servicesPath   = fullPathFor("services")
-    private lazy val registerPath   = fullPathFor("register")
-    private lazy val deregisterPath = fullPathFor("deregister")
-
-    private def fullPathFor(path: String) = s"$basePath/catalog/$path"
 
   }
 
