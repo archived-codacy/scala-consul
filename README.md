@@ -17,7 +17,7 @@ import consul.Consul
 
 instanciate a consul supplying an ip and an optional port indicating a working consul agent:
 ```scala
-val myConsul = new consul.Consul(CONSUL_IP,Option(CONSUL_PORT))
+val myConsul = new consul.Consul(CONSUL_IP,Option(CONSUL_PORT),Option(CONSUL_ACL_TOKEN)
 import myConsul.v1._
 ```
 
@@ -37,9 +37,10 @@ catalog.nodes().map{ case nodes =>
 
 Example - register a service with an http-check on the local node:
 ```scala
+val myAddress = "127.0.0.1"
 val myServicePort = 5000
 val myServiceCheck = agent.service.httpCheck(s"http://localhost:$myServicePort/health","15s")
-val myService = agent.service.LocalService(ServiceId("myServiceId"),ServiceType("myTypeOfService"),Set(ServiceTag("MyTag")),Some(myServicePort),Some(myServiceCheck))
+val myService = agent.service.LocalService(ServiceId("myServiceId"),ServiceType("myTypeOfService"),Set(ServiceTag("MyTag")),Some(myServicePort),Some(myServiceCheck),Some(myAddress))
 agent.service.register(myService)
 ```
 the check ID of the registered service-check is available via: 
