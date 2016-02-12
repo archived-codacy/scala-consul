@@ -1,6 +1,6 @@
 package consul
 
-import java.net.Inet4Address
+import java.net.InetAddress
 
 import consul.v1.acl.AclRequests
 import consul.v1.agent.AgentRequests
@@ -26,7 +26,7 @@ trait ConsulApiV1{
 
 }
 
-class Consul(address: Inet4Address, port: Int = 8500, token: Option[String] = None)
+class Consul(address: InetAddress, port: Int = 8500, token: Option[String] = None)
             (implicit executionContext: ExecutionContext){
 
   lazy val v1: ConsulApiV1 with Types = new ConsulApiV1 with Types{
