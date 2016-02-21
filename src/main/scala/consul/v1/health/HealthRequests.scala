@@ -18,29 +18,27 @@ object HealthRequests {
 
   implicit private val NodesHealthServiceReads: Reads[NodesHealthService] = Json.reads[NodesHealthService]
 
-  def apply(basePath: String)(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics): HealthRequests = new HealthRequests {
+  def apply()(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics): HealthRequests = new HealthRequests {
     def service(service: ServiceType, tag:Option[ServiceTag], passing:Boolean=false,dc:Option[DatacenterId]): Future[Seq[NodesHealthService]] = rb.erased{
       lazy val params = (if(passing) List(("passing","")) else List.empty ) ++ tag.map{ case tag => (("tag",tag.toString)) }
 
       rb.jsonDcRequestMaker(
-        fullPathFor(s"service/$service"),dc,
+        s"/health/service/$service",dc,
         _.withQueryString(params:_*).get()
       )(_.validate[Seq[NodesHealthService]])
     }
 
     def node(nodeID: NodeId,dc:Option[DatacenterId]) = rb.erased(
-      rb.jsonDcRequestMaker(fullPathFor(s"node/$nodeID"),dc, _.get())(_.validate[Seq[Check]])
+      rb.jsonDcRequestMaker(s"/health/node/$nodeID",dc, _.get())(_.validate[Seq[Check]])
     )
 
     def checks(serviceID:ServiceType,dc:Option[DatacenterId]) = rb.erased(
-      rb.jsonDcRequestMaker(fullPathFor(s"checks/$serviceID"),dc, _.get())(_.validate[Seq[Check]])
+      rb.jsonDcRequestMaker(s"/health/checks/$serviceID",dc, _.get())(_.validate[Seq[Check]])
     )
 
     def state(state:CheckStatus,dc:Option[DatacenterId]): Future[Seq[Check]] = rb.erased(
-      rb.jsonDcRequestMaker(fullPathFor(s"state/$state"),dc,_.get())(_.validate[Seq[Check]])
+      rb.jsonDcRequestMaker(s"/health/state/$state",dc,_.get())(_.validate[Seq[Check]])
     )
-
-    private def fullPathFor(path: String) = s"$basePath/health/$path"
 
   }
 

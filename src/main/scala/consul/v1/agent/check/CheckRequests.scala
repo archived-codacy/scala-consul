@@ -46,14 +46,14 @@ trait CheckRequests extends CheckCreators{
 
 object CheckRequests{
 
-  def apply(basePath: String)(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics): CheckRequests = new CheckRequests {
+  def apply()(implicit executionContext: ExecutionContext, rb: ConsulRequestBasics): CheckRequests = new CheckRequests {
 
     def register(check: Check): Future[Boolean] = rb.responseStatusRequestMaker(
-      registerPath,_.put(Json.toJson(check))
+      "/agent/check/register",_.put(Json.toJson(check))
     )(_ == Status.OK)
 
     def deregister(checkId: CheckId): Future[Boolean] = rb.responseStatusRequestMaker(
-      fullPathFor(s"deregister/$checkId"),_.get()
+      s"/agent/check/deregister/$checkId",_.get()
     )(_ == Status.OK)
 
     def pass(checkId: CheckId,note:Option[String]): Future[Boolean] = functionForStatus("pass")(checkId,note)
@@ -64,12 +64,10 @@ object CheckRequests{
 
     private def functionForStatus(status:String) = (checkId: CheckId,note:Option[String]) =>
       rb.responseStatusRequestMaker(
-        fullPathFor(s"$status/$checkId"),
+        s"/agent/check/$status/$checkId",
         (r:WSRequest) => note.map{ case note => r.withQueryString("note"->note) }.getOrElse( r ).get()
       )(_ == Status.OK)
 
-    private def fullPathFor(path: String) = s"$basePath/check/$path"
-
-    private lazy val registerPath = fullPathFor("register")
   }
+
 }
