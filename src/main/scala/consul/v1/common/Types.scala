@@ -23,6 +23,9 @@ trait Types {
 
   type DatacenterId = WrappedType[String,DatacenterIds]
   def DatacenterId: String => DatacenterId = WrappedType.apply
+
+  type Address = WrappedType[String, Addresses]
+  def Address: String => Address = WrappedType.apply
 }
 
 object Types extends Types{
@@ -33,6 +36,7 @@ object Types extends Types{
   sealed trait ServiceTypes
   sealed trait ServiceTags
   sealed trait DatacenterIds
+  sealed trait Addresses
 
   case class ConsulResponseParseException(error:JsError) extends Throwable
 }
