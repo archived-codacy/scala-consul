@@ -41,7 +41,7 @@ Example - register a service with an http-check on the local node:
 val myAddress = "127.0.0.1"
 val myServicePort = 5000
 val myServiceCheck = agent.service.httpCheck(s"http://localhost:$myServicePort/health","15s")
-val myService = agent.service.LocalService(ServiceId("myServiceId"),ServiceType("myTypeOfService"),Set(ServiceTag("MyTag")),Some(myServicePort),Some(myServiceCheck),Some(myAddress))
+val myService = agent.service.LocalService(ServiceId("myServiceId"),ServiceType("myTypeOfService"),Set(ServiceTag("MyTag")),Some(myServicePort),Some(myServiceCheck),Some(Address(myAddress)))
 agent.service.register(myService)
 ```
 the check ID of the registered service-check is available via: 
