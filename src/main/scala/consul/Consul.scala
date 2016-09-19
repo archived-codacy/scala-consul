@@ -2,7 +2,9 @@ package consul
 
 import java.net.InetAddress
 
-import com.ning.http.client.AsyncHttpClientConfig
+import akka.actor.ActorSystem
+import akka.stream.Materializer
+
 import consul.v1.acl.AclRequests
 import consul.v1.agent.AgentRequests
 import consul.v1.catalog.CatalogRequests
@@ -13,8 +15,11 @@ import consul.v1.kv.KvRequests
 import consul.v1.session.SessionRequests
 import consul.v1.status.StatusRequests
 import play.api.Application
-import play.api.libs.ws.{WS, WSClient}
-import play.api.libs.ws.ning.NingWSClient
+import play.api.libs.ws.{ WS, WSClient }
+import play.api.libs.ws.ahc.AhcWSClient
+import play.api.libs.ws.ahc.AhcConfigBuilder
+import org.asynchttpclient.AsyncHttpClientConfig
+import org.asynchttpclient.DefaultAsyncHttpClientConfig.Builder
 
 import scala.concurrent.ExecutionContext
 
@@ -49,14 +54,20 @@ class Consul(address: InetAddress, port: Int = 8500, token: Option[String] = Non
 }
 
 object Consul {
-  def inApplication(address: InetAddress, port: Int = 8500, token: Option[String] = None)
-                   (implicit executionContext: ExecutionContext, app: Application): Consul =
-    new Consul(address, port, token, WS.client)
+  // In Play 2.5.X libs, the built-in WS object is deprecated, so you should now create your own.
+  //
+  // The notion of standalone and application are also deprecated, now it is just default and non-default configurations
 
-  def standalone(address: InetAddress, port: Int = 8500, token: Option[String] = None)
-                (implicit executionContext: ExecutionContext): Consul = {
-    val builder = new AsyncHttpClientConfig.Builder()
-    val client = new NingWSClient(builder.build())
+  def usingClient(client: AhcWSClient, address: InetAddress, port: Int = 8500, token: Option[String] = None)(implicit executionContext: ExecutionContext, materializer: Materializer): Consul = {
     new Consul(address, port, token, client)
   }
+
+  def fromConfig(config: AsyncHttpClientConfig, address: InetAddress, port: Int = 8500, token: Option[String] = None)(implicit executionContext: ExecutionContext, materializer: Materializer): Consul = {
+    usingClient(new AhcWSClient(config), address, port, token)
+  }
+
+  def withDefaultConfig(address: InetAddress, port: Int = 8500, token: Option[String] = None)(implicit executionContext: ExecutionContext, materializer: Materializer): Consul = {
+    fromConfig(new Builder().build(), address, port, token)
+  }
+
 }

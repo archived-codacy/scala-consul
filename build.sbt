@@ -1,6 +1,6 @@
 name := """scala-consul"""
 
-version := "1.1.0-SNAPSHOT"
+version := "1.2.0-SNAPSHOT"
 
 scalaVersion := "2.11.7"
 
@@ -15,9 +15,13 @@ scalacOptions ++= Seq(
 
 resolvers += "Bintray Typesafe Repo" at "http://dl.bintray.com/typesafe/maven-releases/"
 
+val playVersion = settingKey[String]("The version of play libraries to use")
+
+playVersion := "2.5.8"
+
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play-json" % "2.4.3",
-  "com.typesafe.play" %% "play-ws"   % "2.4.3"
+  "com.typesafe.play" %% "play-json" % playVersion.value,
+  "com.typesafe.play" %% "play-ws"   % playVersion.value
 )
 
 organization := "com.codacy"
