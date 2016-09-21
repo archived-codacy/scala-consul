@@ -2,7 +2,8 @@ package consul
 
 import java.net.InetAddress
 
-import com.ning.http.client.AsyncHttpClientConfig
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import consul.v1.acl.AclRequests
 import consul.v1.agent.AgentRequests
 import consul.v1.catalog.CatalogRequests
@@ -12,9 +13,10 @@ import consul.v1.health.HealthRequests
 import consul.v1.kv.KvRequests
 import consul.v1.session.SessionRequests
 import consul.v1.status.StatusRequests
+import org.asynchttpclient.DefaultAsyncHttpClientConfig
 import play.api.Application
+import play.api.libs.ws.ahc.AhcWSClient
 import play.api.libs.ws.{WS, WSClient}
-import play.api.libs.ws.ning.NingWSClient
 
 import scala.concurrent.ExecutionContext
 
@@ -55,8 +57,10 @@ object Consul {
 
   def standalone(address: InetAddress, port: Int = 8500, token: Option[String] = None)
                 (implicit executionContext: ExecutionContext): Consul = {
-    val builder = new AsyncHttpClientConfig.Builder()
-    val client = new NingWSClient(builder.build())
+    implicit val system = ActorSystem("ahcSystem", defaultExecutionContext = Some(executionContext))
+    implicit val materializer = ActorMaterializer()
+    val builder = new DefaultAsyncHttpClientConfig.Builder()
+    val client = new AhcWSClient(builder.build())
     new Consul(address, port, token, client)
   }
 }
