@@ -1,10 +1,8 @@
 package consul.v1.common
 
-import com.ning.http.client.AsyncHttpClientConfig
 import consul.v1.common.Types.DatacenterId
 import play.api.libs.json._
 import play.api.libs.ws.{WS, WSClient, WSRequest, WSResponse}
-import play.api.libs.ws.ning.NingWSClient
 import play.api.Application
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
