@@ -1,12 +1,15 @@
 # scala-consul
 
+**Unmaintained**
+> Codacy is not using consul at the moment and for that reason we are not developing this library any more. If you want to be a maintainer of this library create an [issue](https://github.com/codacy/scala-consul/issues/new) so we can take that into consideration. Also, feel free to fork this and keep your own code.
+
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/1edaae77fef941c39b446b6df8877183)](https://www.codacy.com/app/Codacy/scala-consul)
 [![Circle CI](https://circleci.com/gh/codacy/scala-consul.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/codacy/scala-consul)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.codacy/scala-consul_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.codacy/scala-consul_2.11)
 
 An asynchronous Scala (http://scala-lang.org/) client for Consul (https://consul.io/)
 
-on an sbt project add this line to your build.sbt: 
+on an sbt project add this line to your build.sbt:
 ```scala
 libraryDependencies += "com.codacy" %% "scala-consul" % "1.1.0"
 ```
@@ -31,7 +34,7 @@ kv.put("myKey","myValue")
 
 Example - query the registered nodes:
 ```scala
-catalog.nodes().map{ case nodes => 
+catalog.nodes().map{ case nodes =>
     //do something with my nodes
 }
 ```
@@ -44,7 +47,7 @@ val myServiceCheck = agent.service.httpCheck(s"http://localhost:$myServicePort/h
 val myService = agent.service.LocalService(ServiceId("myServiceId"),ServiceType("myTypeOfService"),Set(ServiceTag("MyTag")),Some(myServicePort),Some(myServiceCheck),Some(Address(myAddress)))
 agent.service.register(myService)
 ```
-the check ID of the registered service-check is available via: 
+the check ID of the registered service-check is available via:
 ```scala
 val myCheckId = myService.checkId
 ```
@@ -58,15 +61,15 @@ and
 agent.service.scriptCheck
 ```
 
-Error Handling: 
+Error Handling:
 
-All api methods return Futures that can fail. To parse Consul responses Play's Json library is used. 
+All api methods return Futures that can fail. To parse Consul responses Play's Json library is used.
 In the unlikely case that the client cannot parse the response the Future will fail and you might want to access the JsError
-parsing resulted in. You can do so by recovering the Future: 
+parsing resulted in. You can do so by recovering the Future:
 
 ```scala
 import consul.v1.common.Types.ConsulResponseParseException
-catalog.nodes().recover{ 
+catalog.nodes().recover{
   case ConsulResponseParseException(jsError) =>  //do something with the JsError
   case NonFatal(otherException) => //something else
 }
