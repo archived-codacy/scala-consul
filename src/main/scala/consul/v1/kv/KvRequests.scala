@@ -42,7 +42,7 @@ object KvRequests {
     }
 
     private def recurseDcRequestHolder(recurse:Boolean,dc:Option[DatacenterId]) = {
-      val params = dc.map("dc"->_.toString).toList ++ Option(recurse).collect{ case true => ("recurse"->"") }
+      val params = dc.map("dc"->_.toString).toList ++ Option(recurse).collect{ case true => "recurse" -> "true" }
       (_:WSRequest).withQueryString(params:_*)
     }
 
