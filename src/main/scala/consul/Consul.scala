@@ -37,7 +37,7 @@ class Consul(address: InetAddress, port: Int = 8500, token: Option[String] = Non
 
   lazy val v1: ConsulApiV1 with Types = new ConsulApiV1 with Types{
     private implicit def requestBasics = new ConsulRequestBasics(token, client)
-    private lazy val basePath = s"http://${address.getHostAddress}:$port/v1"
+    private lazy val basePath = s"http://${address.getHostName}:$port/v1"
     lazy val health:  HealthRequests  = HealthRequests( basePath)
     lazy val agent:   AgentRequests   = AgentRequests(  basePath)
     lazy val catalog: CatalogRequests = CatalogRequests(basePath)
