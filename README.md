@@ -1,7 +1,12 @@
 # scala-consul
 
 **Unmaintained**
-> Codacy is not using consul at the moment and for that reason we are not developing this library any more. If you want to be a maintainer of this library create an [issue](https://github.com/codacy/scala-consul/issues/new) so we can take that into consideration. Also, feel free to fork this and keep your own code.
+> Codacy is not using consul at the moment and for that reason we are not developing this library any more. Feel free to fork this and keep your own code.
+
+## Alternatives
+* https://github.com/verizon/helm
+* https://github.com/dlouwers/reactive-consul
+* https://github.com/BoomTownROI/scala-consul
 
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/1edaae77fef941c39b446b6df8877183)](https://www.codacy.com/app/Codacy/scala-consul)
 [![Circle CI](https://circleci.com/gh/codacy/scala-consul.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/codacy/scala-consul)
